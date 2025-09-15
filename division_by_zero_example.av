@@ -1,0 +1,96 @@
+## AviatorScript 除数为0错误处理示例
+
+## 1. 基本的除数为0检查
+function safeDivide(a, b) {
+    if (b == 0) {
+        return "错误：除数不能为0";
+    }
+    return a / b;
+}
+
+## 2. 使用三元运算符的简洁写法
+function safeDivideTernary(a, b) {
+    return b != 0 ? a / b : "除数不能为0";
+}
+
+## 3. 返回默认值的处理方式
+function safeDivideWithDefault(a, b, defaultValue) {
+    if (b == 0) {
+        return defaultValue != nil ? defaultValue : 0;
+    }
+    return a / b;
+}
+
+## 4. 抛出异常的处理方式
+function safeDivideWithException(a, b) {
+    if (b == 0) {
+        throw "除数为0异常：不能进行除法运算";
+    }
+    return a / b;
+}
+
+## 5. 高精度除法处理
+function safeDecimalDivide(a, b) {
+    if (b == 0) {
+        return decimal("0");
+    }
+    return decimal(a) / decimal(b);
+}
+
+## 测试用例
+let a = 10;
+let b = 0;
+let c = 5;
+
+## 测试基本除法检查
+println("安全除法测试:");
+println("10 / 0 = " + safeDivide(a, b));
+println("10 / 5 = " + safeDivide(a, c));
+
+## 测试三元运算符
+println("\n三元运算符测试:");
+println("10 / 0 = " + safeDivideTernary(a, b));
+println("10 / 5 = " + safeDivideTernary(a, c));
+
+## 测试默认值处理
+println("\n默认值处理测试:");
+println("10 / 0 (默认值-1) = " + safeDivideWithDefault(a, b, -1));
+println("10 / 5 = " + safeDivideWithDefault(a, c, -1));
+
+## 测试高精度除法
+println("\n高精度除法测试:");
+println("10 / 0 = " + safeDecimalDivide(a, b));
+println("10 / 3 = " + safeDecimalDivide(a, 3));
+
+## 6. 实际应用示例：计算平均值
+function calculateAverage(numbers) {
+    if (numbers == nil || len(numbers) == 0) {
+        return "错误：数组为空，无法计算平均值";
+    }
+    
+    let sum = 0;
+    for (i in numbers) {
+        sum = sum + numbers[i];
+    }
+    
+    return sum / len(numbers);
+}
+
+## 测试平均值计算
+let numbers1 = [1, 2, 3, 4, 5];
+let numbers2 = [];
+println("\n平均值计算测试:");
+println("数组 [1,2,3,4,5] 的平均值: " + calculateAverage(numbers1));
+println("空数组的平均值: " + calculateAverage(numbers2));
+
+## 7. 百分比计算的安全处理
+function calculatePercentage(part, total) {
+    if (total == 0) {
+        return "错误：总数不能为0";
+    }
+    return (part / total) * 100;
+}
+
+println("\n百分比计算测试:");
+println("5/0 的百分比: " + calculatePercentage(5, 0));
+println("5/10 的百分比: " + calculatePercentage(5, 10));

@@ -1,0 +1,219 @@
+## AviatorScript 安全数学运算工具库
+## 专门处理除数为0等数学异常情况
+
+## 数学常量
+let MATH_EPSILON = 1e-10;  ## 浮点数比较的精度阈值
+
+## 1. 安全的除法运算
+function safeDivide(a, b, errorMessage) {
+    ## 检查除数是否为0
+    if (b == 0) {
+        if (errorMessage != nil) {
+            return errorMessage;
+        }
+        return "错误：除数为0";
+    }
+    
+    ## 检查是否为数值类型
+    if (type(a) != "long" && type(a) != "double" && type(a) != "decimal") {
+        return "错误：被除数必须是数值类型";
+    }
+    
+    if (type(b) != "long" && type(b) != "double" && type(b) != "decimal") {
+        return "错误：除数必须是数值类型";
+    }
+    
+    return a / b;
+}
+
+## 2. 安全的浮点除法（避免精度问题）
+function safeFloatDivide(a, b) {
+    if (b == 0) {
+        return double("NaN");  ## 返回NaN表示无效运算
+    }
+    return double(a) / double(b);
+}
+
+## 3. 安全的整数除法
+function safeIntDivide(a, b) {
+    if (b == 0) {
+        throw "除数为0异常：整数除法运算失败";
+    }
+    return long(a) / long(b);
+}
+
+## 4. 安全的取模运算
+function safeMod(a, b) {
+    if (b == 0) {
+        return "错误：取模运算的除数不能为0";
+    }
+    return a % b;
+}
+
+## 5. 安全的幂运算
+function safePower(base, exponent) {
+    ## 检查0的负数次幂
+    if (base == 0 && exponent < 0) {
+        return "错误：0的负数次幂未定义";
+    }
+    
+    ## 检查无穷大的情况
+    if (exponent > 1000) {
+        return "警告：指数过大，可能导致溢出";
+    }
+    
+    return math.pow(base, exponent);
+}
+
+## 6. 安全的平方根运算
+function safeSqrt(x) {
+    if (x < 0) {
+        return "错误：负数没有实数平方根";
+    }
+    return math.sqrt(x);
+}
+
+## 7. 安全的对数运算
+function safeLog(x, base) {
+    if (x <= 0) {
+        return "错误：对数的真数必须大于0";
+    }
+    if (base <= 0 || base == 1) {
+        return "错误：对数的底数必须大于0且不等于1";
+    }
+    
+    return math.log(x) / math.log(base);
+}
+
+## 8. 批量安全运算
+function safeBatchDivide(dividends, divisors) {
+    let results = [];
+    let errors = [];
+    
+    for (i in range(len(dividends))) {
+        let result = safeDivide(dividends[i], divisors[i]);
+        if (type(result) == "string" && string.contains(result, "错误")) {
+            errors = seq.add(errors, "索引" + i + ": " + result);
+        }
+        results = seq.add(results, result);
+    }
+    
+    return map(
+        "results" -> results,
+        "errors" -> errors,
+        "success_count" -> len(dividends) - len(errors)
+    );
+}
+
+## 9. 数学表达式安全解析器
+function safeEval(expression) {
+    ## 简单的表达式安全检查
+    if (string.contains(expression, "/ 0") || string.contains(expression, "/0")) {
+        return "错误：表达式中包含除数为0的情况";
+    }
+    
+    try {
+        return aviator.eval(expression);
+    } catch (e) {
+        return "错误：表达式解析失败 - " + string(e);
+    }
+}
+
+## 10. 数值验证工具
+function validateNumber(value, min, max) {
+    if (type(value) != "long" && type(value) != "double" && type(value) != "decimal") {
+        return false;
+    }
+    
+    if (min != nil && value < min) {
+        return false;
+    }
+    
+    if (max != nil && value > max) {
+        return false;
+    }
+    
+    return true;
+}
+
+## 11. 浮点数比较（处理精度问题）
+function floatEquals(a, b, epsilon) {
+    if (epsilon == nil) {
+        epsilon = MATH_EPSILON;
+    }
+    return math.abs(a - b) < epsilon;
+}
+
+## 12. 统计运算安全工具
+function safeMean(numbers) {
+    if (numbers == nil || len(numbers) == 0) {
+        return "错误：数组为空";
+    }
+    
+    let sum = 0;
+    let count = 0;
+    
+    for (i in numbers) {
+        if (validateNumber(numbers[i])) {
+            sum = sum + numbers[i];
+            count = count + 1;
+        }
+    }
+    
+    if (count == 0) {
+        return "错误：数组中没有有效数值";
+    }
+    
+    return sum / count;
+}
+
+## 13. 比率计算工具
+function safeRatio(a, b, precision) {
+    if (precision == nil) {
+        precision = 2;
+    }
+    
+    if (b == 0) {
+        return "错误：分母不能为0";
+    }
+    
+    let ratio = a / b;
+    return math.round(ratio * math.pow(10, precision)) / math.pow(10, precision);
+}
+
+## 测试函数
+function runTests() {
+    println("=== AviatorScript 安全数学运算测试 ===");
+    
+    ## 测试基本除法
+    println("\n1. 基本除法测试:");
+    println("10 / 5 = " + safeDivide(10, 5));
+    println("10 / 0 = " + safeDivide(10, 0));
+    println("10 / 0 (自定义错误) = " + safeDivide(10, 0, "自定义错误信息"));
+    
+    ## 测试浮点除法
+    println("\n2. 浮点除法测试:");
+    println("10.5 / 3.0 = " + safeFloatDivide(10.5, 3.0));
+    println("10.0 / 0.0 = " + safeFloatDivide(10.0, 0.0));
+    
+    ## 测试批量运算
+    println("\n3. 批量除法测试:");
+    let dividends = [10, 20, 30, 40];
+    let divisors = [2, 0, 5, 8];
+    let batchResult = safeBatchDivide(dividends, divisors);
+    println("批量运算结果: " + batchResult);
+    
+    ## 测试统计运算
+    println("\n4. 统计运算测试:");
+    let numbers = [1, 2, 3, 4, 5];
+    println("平均值: " + safeMean(numbers));
+    println("空数组平均值: " + safeMean([]));
+    
+    ## 测试比率计算
+    println("\n5. 比率计算测试:");
+    println("3/7 的比率 (2位精度): " + safeRatio(3, 7, 2));
+    println("5/0 的比率: " + safeRatio(5, 0));
+}
+
+## 运行测试
+runTests();
