@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<include>
+  <!-- 呼入转人工功能的拨号计划 -->
+  <extension name="inbound_to_agent">
+    <condition field="destination_number" expression="^(.*)$">
+      <action application="set" data="hangup_after_bridge=true"/>
+      <action application="set" data="continue_on_fail=true"/>
+      <action application="set" data="ringback=%(2000,4000,440,480)"/>
+      
+      <!-- 播放等待音频 -->
+      <action application="playback" data="ivr/ivr-please_hold_while_party_answered.wav"/>
+      
+      <!-- 转接到人工坐席 -->
+      <action application="lua" data="transfer_to_agent.lua"/>
+      
+      <!-- 如果转接失败，播放提示音 -->
+      <action application="playback" data="ivr/ivr-no_one_available.wav"/>
+      <action application="hangup" data="NORMAL_CLEARING"/>
+    </condition>
+  </extension>
+  
+  <!-- 人工坐席分机 -->
+  <extension name="agent_extension">
+    <condition field="destination_number" expression="^1001$">
+      <action application="answer"/>
+      <action application="playback" data="ivr/ivr-call_being_transferred.wav"/>
+      <action application="bridge" data="user/1001@$${domain}"/>
+    </condition>
+  </extension>
+  
+  <!-- 队列转接 -->
+  <extension name="queue_transfer">
+    <condition field="destination_number" expression="^queue_agent$">
+      <action application="answer"/>
+      <action application="playback" data="ivr/ivr-please_hold_while_party_answered.wav"/>
+      <action application="fifo" data="support@default"/>
+    </condition>
+  </extension>
+</include>
