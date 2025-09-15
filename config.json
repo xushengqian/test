@@ -1,0 +1,42 @@
+{
+  "indicators": {
+    "sma": [5, 10, 20, 50],
+    "ema": [12, 26, 50],
+    "rsi": {
+      "period": 14
+    },
+    "macd": {
+      "fast_period": 12,
+      "slow_period": 26,
+      "signal_period": 9
+    },
+    "bollinger": {
+      "period": 20,
+      "std_dev": 2
+    },
+    "stochastic": {
+      "k_period": 14,
+      "d_period": 3
+    },
+    "atr": {
+      "period": 14
+    },
+    "williams_r": {
+      "period": 14
+    }
+  },
+  "output": {
+    "formats": ["csv", "json", "database"],
+    "directory": "output",
+    "include_summary": true
+  },
+  "data": {
+    "columns": {
+      "open": "open",
+      "high": "high", 
+      "low": "low",
+      "close": "close",
+      "volume": "volume"
+    }
+  }
+}
