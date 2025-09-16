@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: freeswitch_calls
+      POSTGRES_USER: freeswitch
+      POSTGRES_PASSWORD: freeswitch123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  freeswitch:
+    image: drachtio/freeswitch:1.10.7
+    ports:
+      - "5060:5060/udp"
+      - "5060:5060/tcp"
+      - "8021:8021"
+      - "64535-65535:64535-65535/udp"
+    volumes:
+      - ./freeswitch/conf:/usr/local/freeswitch/conf
+      - ./freeswitch/scripts:/usr/local/freeswitch/scripts
+    environment:
+      - FS_CMD_IP=0.0.0.0
+      - FS_EVENT_IP=0.0.0.0
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+      - freeswitch
+    environment:
+      - DATABASE_URL=postgresql://freeswitch:freeswitch123@postgres:5432/freeswitch_calls
+      - REDIS_URL=redis://redis:6379
+      - FREESWITCH_HOST=freeswitch
+      - FREESWITCH_PORT=8021
+    volumes:
+      - ./app:/app
+      - ./freeswitch/scripts:/app/freeswitch_scripts
+
+volumes:
+  postgres_data:

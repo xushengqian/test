@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<include>
+  <context name="default">
+    <extension name="outbound_call">
+      <condition field="destination_number" expression="^(\d+)$">
+        <action application="set" data="call_uuid=${uuid}"/>
+        <action application="set" data="call_id=${call_id}"/>
+        <action application="set" data="phone_number=${destination_number}"/>
+        <action application="set" data="agent_id=${agent_id}"/>
+        
+        <action application="set" data="record_sample_rate=16000"/>
+        <action application="set" data="record_channels=1"/>
+        <action application="record_session" data="/tmp/call_${uuid}.wav"/>
+        
+        <action application="lua" data="start_transcription.lua"/>
+        <action application="bridge" data="sofia/gateway/trunk/${destination_number}"/>
+        <action application="lua" data="end_transcription.lua"/>
+      </condition>
+    </extension>
+  </context>
+</include>

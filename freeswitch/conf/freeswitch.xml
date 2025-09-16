@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration name="freeswitch.xml" description="FreeSWITCH Configuration">
+  <global_settings>
+    <param name="log-level" value="info"/>
+    <param name="auto-create-sip-profiles" value="true"/>
+  </global_settings>
+
+  <profiles>
+    <X-PRE-PROCESS cmd="include" data="sofia.conf.xml"/>
+  </profiles>
+
+  <chatplan>
+    <X-PRE-PROCESS cmd="include" data="chatplan/default.xml"/>
+  </chatplan>
+
+  <directory>
+    <X-PRE-PROCESS cmd="include" data="directory/default.xml"/>
+  </directory>
+
+  <dialplan>
+    <X-PRE-PROCESS cmd="include" data="dialplan/default.xml"/>
+  </dialplan>
+
+  <applications>
+    <X-PRE-PROCESS cmd="include" data="ivr.conf.xml"/>
+  </applications>
+
+  <timers>
+    <X-PRE-PROCESS cmd="include" data="timers.conf.xml"/>
+  </timers>
+
+  <event_socket>
+    <param name="nat-map" value="false"/>
+    <param name="listen-ip" value="0.0.0.0"/>
+    <param name="listen-port" value="8021"/>
+    <param name="password" value="ClueCon"/>
+  </event_socket>
+
+  <modules>
+    <X-PRE-PROCESS cmd="include" data="modules.conf.xml"/>
+  </modules>
+
+  <languages>
+    <X-PRE-PROCESS cmd="include" data="languages.conf.xml"/>
+  </languages>
+</configuration>
