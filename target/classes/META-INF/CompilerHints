@@ -1,0 +1,15 @@
+dontinline,*.*_all_jmhStub
+dontinline,*.*_avgt_jmhStub
+dontinline,*.*_sample_jmhStub
+dontinline,*.*_ss_jmhStub
+dontinline,*.*_thrpt_jmhStub
+inline,com/example/aviator/PerformanceBenchmark.setup
+inline,com/example/aviator/PerformanceBenchmark.testComplexMathNative
+inline,com/example/aviator/PerformanceBenchmark.testComplexMathOptimized
+inline,com/example/aviator/PerformanceBenchmark.testComplexMathPool
+inline,com/example/aviator/PerformanceBenchmark.testExpressionPool
+inline,com/example/aviator/PerformanceBenchmark.testNativeAviator
+inline,com/example/aviator/PerformanceBenchmark.testOptimizedExecutor
+inline,com/example/aviator/PerformanceBenchmark.testStringExprNative
+inline,com/example/aviator/PerformanceBenchmark.testStringExprOptimized
+inline,com/example/aviator/PerformanceBenchmark.testStringExprPool
