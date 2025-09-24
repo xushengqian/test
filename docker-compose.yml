@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: metrics
+      MYSQL_USER: metrics_user
+      MYSQL_PASSWORD: metrics_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: metrics_user
+      POSTGRES_PASSWORD: metrics_password
+      POSTGRES_DB: metrics
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  metric-scheduler:
+    build: .
+    depends_on:
+      - redis
+      - mysql
+      - postgres
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USERNAME=metrics_user
+      - DB_PASSWORD=metrics_password
+      - DB_DATABASE=metrics
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - RATE_LIMIT_QPS=100
+      - RATE_LIMIT_QPM=5000
+      - RATE_LIMIT_CONCURRENT=50
+      - SCHEDULER_TIMEZONE=UTC
+      - ENABLE_PROMETHEUS=true
+      - PROMETHEUS_PORT=8000
+      - LOG_LEVEL=INFO
+    ports:
+      - "8000:8000"  # Prometheus metrics
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+
+volumes:
+  redis_data:
+  mysql_data:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
