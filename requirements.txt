@@ -1,0 +1,46 @@
+# 大批量指标调度执行系统依赖包
+# 数据库相关
+PyMySQL==1.1.0
+SQLAlchemy==2.0.23
+alembic==1.12.1
+
+# 调度相关
+croniter==2.0.1
+APScheduler==3.10.4
+
+# 异步和并发
+asyncio-mqtt==0.16.1
+aioredis==2.0.1
+celery==5.3.4
+redis==5.0.1
+
+# Web框架和API
+FastAPI==0.104.1
+uvicorn==0.24.0
+pydantic==2.5.0
+
+# 配置管理
+python-dotenv==1.0.0
+pyyaml==6.0.1
+
+# 日志和监控
+loguru==0.7.2
+prometheus-client==0.19.0
+
+# 工具库
+click==8.1.7
+rich==13.7.0
+httpx==0.25.2
+jinja2==3.1.2
+
+# 加密和安全
+cryptography==41.0.8
+bcrypt==4.1.2
+
+# 数据处理
+pandas==2.1.4
+numpy==1.25.2
+
+# 测试
+pytest==7.4.3
+pytest-asyncio==0.21.1

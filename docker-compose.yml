@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  # MySQL数据库
+  mysql:
+    image: mysql:8.0
+    container_name: metric_scheduler_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: metric_scheduler
+      MYSQL_USER: scheduler_user
+      MYSQL_PASSWORD: scheduler_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    networks:
+      - scheduler_network
+
+  # Redis缓存
+  redis:
+    image: redis:7-alpine
+    container_name: metric_scheduler_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - scheduler_network
+
+  # 指标调度器应用
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: metric_scheduler_app
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USERNAME=scheduler_user
+      - DB_PASSWORD=scheduler_password
+      - DB_DATABASE=metric_scheduler
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SCHEDULER_ENABLED=true
+      - EXECUTOR_MAX_WORKERS=10
+      - LOG_LEVEL=INFO
+      - NODE_ID=docker-node-1
+    ports:
+      - "8000:8000"
+      - "9090:9090"  # Prometheus metrics
+    volumes:
+      - ./logs:/app/logs
+      - ./config:/app/config
+    depends_on:
+      - mysql
+      - redis
+    restart: unless-stopped
+    networks:
+      - scheduler_network
+
+  # Prometheus监控
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: metric_scheduler_prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - scheduler_network
+
+  # Grafana可视化
+  grafana:
+    image: grafana/grafana:latest
+    container_name: metric_scheduler_grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - scheduler_network
+
+volumes:
+  mysql_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  scheduler_network:
+    driver: bridge
