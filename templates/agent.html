@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服工作台</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-headset"></i> 客服工作台</h1>
+            <div class="header-actions">
+                <div class="agent-status">
+                    <span id="agentStatus" class="status-badge available">离线</span>
+                    <span id="agentName">未登录</span>
+                </div>
+                <a href="/" class="btn btn-secondary">
+                    <i class="fas fa-monitor"></i> 监控台
+                </a>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h3><i class="fas fa-phone-volume"></i> 待接入通话</h3>
+                </div>
+                <div id="pendingCalls" class="call-list">
+                    <div class="no-calls">
+                        <i class="fas fa-phone-slash"></i>
+                        <p>暂无待接入通话</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div id="loginScreen" class="welcome-screen">
+                    <div class="welcome-content">
+                        <i class="fas fa-user-tie welcome-icon"></i>
+                        <h2>客服登录</h2>
+                        <p>请输入您的姓名开始工作</p>
+                        <div class="login-form">
+                            <input type="text" id="agentNameInput" placeholder="请输入您的姓名" class="form-control">
+                            <button id="loginBtn" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt"></i> 开始工作
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="workArea" class="call-detail" style="display: none;">
+                    <div id="noActiveCall" class="welcome-screen">
+                        <div class="welcome-content">
+                            <i class="fas fa-clock welcome-icon"></i>
+                            <h2>等待通话接入</h2>
+                            <p>当有客户需要人工服务时，通话将出现在左侧列表中</p>
+                            <div class="agent-stats">
+                                <div class="stat-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>今日接听: <strong>0</strong></span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>在线时长: <strong id="onlineTime">00:00:00</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="activeCall" style="display: none;">
+                        <div class="call-header">
+                            <div class="call-info">
+                                <h3 id="activeCallTitle">通话中</h3>
+                                <div class="call-meta">
+                                    <span id="activeCallPhone" class="phone-number"></span>
+                                    <span id="activeCallDuration" class="duration"></span>
+                                </div>
+                            </div>
+                            <div class="call-actions">
+                                <button id="endActiveCallBtn" class="btn btn-danger">
+                                    <i class="fas fa-phone-slash"></i> 结束通话
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="messages-container">
+                            <div id="activeMessagesList" class="messages-list"></div>
+                        </div>
+
+                        <div class="message-input-container">
+                            <div class="message-input">
+                                <input type="text" id="messageInput" placeholder="输入回复内容..." class="form-control">
+                                <button id="sendMessageBtn" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i> 发送
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='js/agent.js') }}"></script>
+</body>
+</html>
