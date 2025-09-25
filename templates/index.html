@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机器人外呼监控系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-robot"></i> 机器人外呼监控系统</h1>
+            <div class="header-actions">
+                <button id="startCallBtn" class="btn btn-primary">
+                    <i class="fas fa-phone"></i> 发起外呼
+                </button>
+                <a href="/agent" class="btn btn-secondary">
+                    <i class="fas fa-headset"></i> 客服工作台
+                </a>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h3><i class="fas fa-list"></i> 通话列表</h3>
+                    <div class="status-indicators">
+                        <span class="status-dot connecting"></span> 连接中
+                        <span class="status-dot robot"></span> 机器人
+                        <span class="status-dot agent"></span> 人工
+                        <span class="status-dot ended"></span> 已结束
+                    </div>
+                </div>
+                <div id="callList" class="call-list">
+                    <div class="no-calls">
+                        <i class="fas fa-phone-slash"></i>
+                        <p>暂无通话记录</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div id="welcomeScreen" class="welcome-screen">
+                    <div class="welcome-content">
+                        <i class="fas fa-robot welcome-icon"></i>
+                        <h2>欢迎使用机器人外呼系统</h2>
+                        <p>选择左侧通话记录查看详情，或点击"发起外呼"开始新的通话</p>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <i class="fas fa-comments"></i>
+                                <span>实时通话内容显示</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-user-tie"></i>
+                                <span>人工客服无缝接入</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-chart-line"></i>
+                                <span>通话状态实时监控</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="callDetail" class="call-detail" style="display: none;">
+                    <div class="call-header">
+                        <div class="call-info">
+                            <h3 id="callTitle">通话详情</h3>
+                            <div class="call-meta">
+                                <span id="callPhone" class="phone-number"></span>
+                                <span id="callStatus" class="status-badge"></span>
+                                <span id="callDuration" class="duration"></span>
+                            </div>
+                        </div>
+                        <div class="call-actions">
+                            <button id="endCallBtn" class="btn btn-danger">
+                                <i class="fas fa-phone-slash"></i> 结束通话
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="messages-container">
+                        <div id="messagesList" class="messages-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 发起外呼模态框 -->
+    <div id="startCallModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-phone"></i> 发起外呼</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="phoneInput">客户电话号码</label>
+                    <input type="tel" id="phoneInput" placeholder="请输入电话号码" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmCallBtn" class="btn btn-primary">
+                    <i class="fas fa-phone"></i> 开始呼叫
+                </button>
+                <button class="btn btn-secondary modal-close">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
