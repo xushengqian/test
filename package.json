@@ -1,0 +1,33 @@
+{
+  "name": "robot-outbound-call-system",
+  "version": "1.0.0",
+  "description": "机器人外呼系统 - 支持坐席主动接入和客户交互",
+  "main": "server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon backend/server.js",
+    "client": "cd frontend && npm start",
+    "install-all": "npm install && cd frontend && npm install",
+    "build": "cd frontend && npm run build"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "mongoose": "^7.5.0",
+    "axios": "^1.5.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "winston": "^3.10.0",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.0",
+    "twilio": "^4.16.0",
+    "simple-peer": "^9.11.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "concurrently": "^8.2.1"
+  }
+}
