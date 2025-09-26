@@ -1,0 +1,200 @@
+<!-- FreeSWITCH Dialplan Configuration for Agent System -->
+<!-- 坐席系统拨号计划配置 -->
+
+<include>
+  <!-- 主IVR入口 -->
+  <extension name="main_ivr">
+    <condition field="destination_number" expression="^(8000|8888)$">
+      <action application="answer"/>
+      <action application="sleep" data="500"/>
+      <action application="lua" data="main_ivr.lua"/>
+    </condition>
+  </extension>
+
+  <!-- 坐席队列直接入口 -->
+  <extension name="agent_queue">
+    <condition field="destination_number" expression="^8001$">
+      <action application="answer"/>
+      <action application="lua" data="agent_queue.lua"/>
+    </condition>
+  </extension>
+
+  <!-- 销售队列 -->
+  <extension name="sales_queue">
+    <condition field="destination_number" expression="^sales_queue$">
+      <action application="set" data="queue_name=sales_queue"/>
+      <action application="set" data="required_skill=sales"/>
+      <action application="lua" data="agent_queue.lua sales"/>
+    </condition>
+  </extension>
+
+  <!-- 技术支持队列 -->
+  <extension name="support_queue">
+    <condition field="destination_number" expression="^support_queue$">
+      <action application="set" data="queue_name=support_queue"/>
+      <action application="set" data="required_skill=support"/>
+      <action application="lua" data="agent_queue.lua support"/>
+    </condition>
+  </extension>
+
+  <!-- 账单队列 -->
+  <extension name="billing_queue">
+    <condition field="destination_number" expression="^billing_queue$">
+      <action application="set" data="queue_name=billing_queue"/>
+      <action application="set" data="required_skill=billing"/>
+      <action application="lua" data="agent_queue.lua billing"/>
+    </condition>
+  </extension>
+
+  <!-- 坐席登录 -->
+  <extension name="agent_login">
+    <condition field="destination_number" expression="^\*61$">
+      <action application="answer"/>
+      <action application="sleep" data="500"/>
+      <action application="playback" data="ivr/ivr-please_enter_your_agent_id.wav"/>
+      <action application="play_and_get_digits" data="3 10 3 3000 # ivr/ivr-please_enter_your_agent_id.wav ivr/ivr-invalid_entry.wav agent_id \d+"/>
+      <action application="playback" data="ivr/ivr-please_enter_your_extension.wav"/>
+      <action application="play_and_get_digits" data="3 10 3 3000 # ivr/ivr-please_enter_your_extension.wav ivr/ivr-invalid_entry.wav agent_extension \d+"/>
+      <action application="lua" data="agent_management.lua login ${agent_id} ${agent_extension}"/>
+    </condition>
+  </extension>
+
+  <!-- 坐席登出 -->
+  <extension name="agent_logout">
+    <condition field="destination_number" expression="^\*62$">
+      <action application="answer"/>
+      <action application="sleep" data="500"/>
+      <action application="set" data="agent_id=${caller_id_number}"/>
+      <action application="lua" data="agent_management.lua logout ${agent_id}"/>
+    </condition>
+  </extension>
+
+  <!-- 坐席休息 -->
+  <extension name="agent_break">
+    <condition field="destination_number" expression="^\*63$">
+      <action application="answer"/>
+      <action application="sleep" data="500"/>
+      <action application="set" data="agent_id=${caller_id_number}"/>
+      <action application="lua" data="agent_management.lua break ${agent_id}"/>
+    </condition>
+  </extension>
+
+  <!-- 坐席就绪 -->
+  <extension name="agent_available">
+    <condition field="destination_number" expression="^\*64$">
+      <action application="answer"/>
+      <action application="sleep" data="500"/>
+      <action application="set" data="agent_id=${caller_id_number}"/>
+      <action application="lua" data="agent_management.lua available ${agent_id}"/>
+    </condition>
+  </extension>
+
+  <!-- 坐席状态查询 -->
+  <extension name="agent_status">
+    <condition field="destination_number" expression="^\*65$">
+      <action application="answer"/>
+      <action application="sleep" data="500"/>
+      <action application="set" data="agent_id=${caller_id_number}"/>
+      <action application="lua" data="agent_management.lua status ${agent_id}"/>
+    </condition>
+  </extension>
+
+  <!-- 坐席快速登录（使用分机号作为坐席ID） -->
+  <extension name="agent_quick_login">
+    <condition field="destination_number" expression="^\*60$">
+      <action application="answer"/>
+      <action application="sleep" data="500"/>
+      <action application="set" data="agent_id=${caller_id_number}"/>
+      <action application="set" data="agent_extension=${caller_id_number}"/>
+      <action application="lua" data="agent_management.lua login ${agent_id} ${agent_extension}"/>
+    </condition>
+  </extension>
+
+  <!-- 监听坐席通话 -->
+  <extension name="agent_monitor">
+    <condition field="destination_number" expression="^\*66(\d+)$">
+      <action application="answer"/>
+      <action application="set" data="agent_to_monitor=$1"/>
+      <action application="set" data="agent_channel=${hash(select/${agent_to_monitor})}"/>
+      <action application="eavesdrop" data="${agent_channel}"/>
+    </condition>
+  </extension>
+
+  <!-- 耳语功能（只有坐席能听到） -->
+  <extension name="agent_whisper">
+    <condition field="destination_number" expression="^\*67(\d+)$">
+      <action application="answer"/>
+      <action application="set" data="agent_to_whisper=$1"/>
+      <action application="set" data="agent_channel=${hash(select/${agent_to_whisper})}"/>
+      <action application="eavesdrop" data="${agent_channel} w"/>
+    </condition>
+  </extension>
+
+  <!-- 强插功能（三方通话） -->
+  <extension name="agent_barge">
+    <condition field="destination_number" expression="^\*68(\d+)$">
+      <action application="answer"/>
+      <action application="set" data="agent_to_barge=$1"/>
+      <action application="set" data="agent_channel=${hash(select/${agent_to_barge})}"/>
+      <action application="three_way" data="${agent_channel}"/>
+    </condition>
+  </extension>
+
+  <!-- 队列统计查询 -->
+  <extension name="queue_stats">
+    <condition field="destination_number" expression="^\*69$">
+      <action application="answer"/>
+      <action application="sleep" data="500"/>
+      <action application="lua" data="queue_stats.lua"/>
+    </condition>
+  </extension>
+
+  <!-- 紧急呼叫转接（优先级最高） -->
+  <extension name="emergency_transfer">
+    <condition field="destination_number" expression="^911$">
+      <action application="set" data="queue_priority=emergency"/>
+      <action application="set" data="bypass_queue=true"/>
+      <action application="lua" data="agent_queue.lua emergency"/>
+    </condition>
+  </extension>
+
+  <!-- VIP客户专线 -->
+  <extension name="vip_line">
+    <condition field="destination_number" expression="^8888$">
+      <action application="answer"/>
+      <action application="set" data="queue_priority=vip"/>
+      <action application="set" data="max_wait_time=60"/>
+      <action application="lua" data="agent_queue.lua vip"/>
+    </condition>
+  </extension>
+
+  <!-- 回拨请求 -->
+  <extension name="callback_request">
+    <condition field="destination_number" expression="^\*70$">
+      <action application="answer"/>
+      <action application="playback" data="ivr/ivr-callback_request.wav"/>
+      <action application="lua" data="callback_manager.lua request ${caller_id_number}"/>
+    </condition>
+  </extension>
+
+  <!-- 测试坐席系统 -->
+  <extension name="test_agent_system">
+    <condition field="destination_number" expression="^8999$">
+      <action application="answer"/>
+      <action application="playback" data="ivr/ivr-testing_agent_system.wav"/>
+      
+      <!-- 创建测试坐席 -->
+      <action application="set" data="test_agent1=1001"/>
+      <action application="set" data="test_agent2=1002"/>
+      
+      <!-- 模拟坐席登录 -->
+      <action application="lua" data="agent_management.lua login ${test_agent1} ${test_agent1}"/>
+      <action application="lua" data="agent_management.lua login ${test_agent2} ${test_agent2}"/>
+      
+      <!-- 播放测试结果 -->
+      <action application="playback" data="ivr/ivr-test_complete.wav"/>
+      <action application="hangup"/>
+    </condition>
+  </extension>
+
+</include>
