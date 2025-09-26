@@ -1,0 +1,37 @@
+{
+  "name": "fs-robot-outbound-call",
+  "version": "1.0.0",
+  "description": "FreeSWITCH机器人外呼系统，支持人工接入",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.5.4",
+    "modesl": "^2.0.0",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "winston": "^3.11.0",
+    "node-schedule": "^2.1.1",
+    "uuid": "^9.0.1",
+    "redis": "^4.6.10",
+    "ioredis": "^5.3.2",
+    "@alicloud/nls-filetrans-2018-08-17": "^1.0.0",
+    "@alicloud/pop-core": "^1.7.13",
+    "tencentcloud-sdk-nodejs": "^4.0.700",
+    "mysql2": "^3.6.3",
+    "sequelize": "^6.35.0",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.7.0"
+  }
+}
