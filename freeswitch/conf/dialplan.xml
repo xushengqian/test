@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<include>
+  <context name="default">
+    
+    <!-- 机器人外呼拨号计划 -->
+    <extension name="robot_outbound">
+      <condition field="destination_number" expression="^robot_call_(\d+)$">
+        <action application="set" data="customer_phone=$1"/>
+        <action application="set" data="call_direction=outbound"/>
+        <action application="set" data="robot_session=true"/>
+        <action application="export" data="customer_phone=$1"/>
+        <action application="export" data="call_direction=outbound"/>
+        
+        <!-- 设置录音 -->
+        <action application="set" data="RECORD_TITLE=Robot Call ${customer_phone}"/>
+        <action application="set" data="RECORD_COPYRIGHT=Robot Call System"/>
+        <action application="record_session" data="${recordings_dir}/${strftime(%Y-%m-%d-%H-%M-%S)}_${customer_phone}_robot.wav"/>
+        
+        <!-- 发起外呼 -->
+        <action application="bridge" data="sofia/gateway/outbound/${customer_phone}"/>
+        
+        <!-- 外呼失败处理 -->
+        <action application="log" data="ERROR Robot call to ${customer_phone} failed"/>
+        <action application="curl" data="${api_server}/api/call/failed/${customer_phone}"/>
+      </condition>
+    </extension>
+
+    <!-- 外呼成功后的机器人对话流程 -->
+    <extension name="robot_conversation">
+      <condition field="destination_number" expression="^robot_conversation$">
+        <!-- 播放欢迎语 -->
+        <action application="sleep" data="1000"/>
+        <action application="speak" data="tts_commandline|您好，我是智能客服机器人，请问有什么可以帮助您的吗？"/>
+        
+        <!-- 开始语音识别和对话 -->
+        <action application="lua" data="robot_conversation.lua"/>
+      </condition>
+    </extension>
+
+    <!-- 人工接入转接 -->
+    <extension name="transfer_to_human">
+      <condition field="destination_number" expression="^transfer_human_(\d+)$">
+        <action application="set" data="customer_phone=$1"/>
+        <action application="set" data="transfer_reason=${transfer_reason}"/>
+        
+        <!-- 播放转接提示 -->
+        <action application="speak" data="tts_commandline|正在为您转接人工客服，请稍等"/>
+        
+        <!-- 查找可用坐席 -->
+        <action application="lua" data="find_available_agent.lua"/>
+        
+        <!-- 转接到人工坐席队列 -->
+        <action application="fifo" data="${human_queue} in"/>
+      </condition>
+    </extension>
+
+    <!-- 人工坐席接入 -->
+    <extension name="human_agent">
+      <condition field="destination_number" expression="^agent_(\d+)$">
+        <action application="set" data="agent_id=$1"/>
+        <action application="answer"/>
+        
+        <!-- 播放坐席提示音 -->
+        <action application="playback" data="tone_stream://%(200,100,500,600,700)"/>
+        
+        <!-- 进入人工队列等待 -->
+        <action application="fifo" data="${human_queue} out wait"/>
+      </condition>
+    </extension>
+
+    <!-- 三方通话 - 机器人、客户、人工 -->
+    <extension name="three_way_call">
+      <condition field="destination_number" expression="^three_way_(\d+)_(\d+)$">
+        <action application="set" data="customer_uuid=$1"/>
+        <action application="set" data="agent_uuid=$2"/>
+        
+        <!-- 建立三方通话 -->
+        <action application="conference" data="three_way_${customer_uuid}@default"/>
+      </condition>
+    </extension>
+
+    <!-- 通话监听 -->
+    <extension name="call_monitor">
+      <condition field="destination_number" expression="^monitor_(\d+)$">
+        <action application="set" data="target_uuid=$1"/>
+        <action application="eavesdrop" data="${target_uuid}"/>
+      </condition>
+    </extension>
+
+    <!-- 默认处理 -->
+    <extension name="default">
+      <condition field="destination_number" expression="^(.*)$">
+        <action application="log" data="INFO Unhandled call to $1"/>
+        <action application="hangup"/>
+      </condition>
+    </extension>
+
+  </context>
+
+  <!-- 公共上下文 -->
+  <context name="public">
+    <extension name="public_did">
+      <condition field="destination_number" expression="^(\d{11})$">
+        <action application="transfer" data="$1 XML default"/>
+      </condition>
+    </extension>
+  </context>
+
+</include>

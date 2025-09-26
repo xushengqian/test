@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<include>
+  <!-- 内部SIP配置 -->
+  <profile name="internal">
+    <gateways>
+      <!-- 外呼网关配置 -->
+      <gateway name="outbound">
+        <param name="username" data="your_sip_username"/>
+        <param name="password" data="your_sip_password"/>
+        <param name="realm" data="your_sip_provider.com"/>
+        <param name="proxy" data="your_sip_provider.com"/>
+        <param name="register" data="true"/>
+        <param name="caller-id-in-from" data="true"/>
+        <param name="ping" data="25"/>
+      </gateway>
+    </gateways>
+
+    <settings>
+      <param name="debug" value="0"/>
+      <param name="sip-trace" value="no"/>
+      <param name="sip-capture" value="no"/>
+      <param name="rfc2833-pt" value="101"/>
+      <param name="sip-port" value="5060"/>
+      <param name="dialplan" value="XML"/>
+      <param name="context" value="default"/>
+      <param name="dtmf-duration" value="2000"/>
+      <param name="inbound-codec-prefs" value="PCMU,PCMA,G729"/>
+      <param name="outbound-codec-prefs" value="PCMU,PCMA,G729"/>
+      <param name="hold-music" value="$${hold_music}"/>
+      <param name="apply-nat-acl" value="nat.auto"/>
+      <param name="manage-presence" value="true"/>
+      <param name="max-proceeding" value="1000"/>
+      <param name="inbound-use-callid-as-uuid" value="true"/>
+      <param name="outbound-use-uuid-as-callid" value="true"/>
+    </settings>
+  </profile>
+
+  <!-- 外部SIP配置 -->
+  <profile name="external">
+    <settings>
+      <param name="debug" value="0"/>
+      <param name="sip-trace" value="no"/>
+      <param name="sip-port" value="5080"/>
+      <param name="dialplan" value="XML"/>
+      <param name="context" value="public"/>
+      <param name="apply-nat-acl" value="nat.auto"/>
+      <param name="inbound-codec-prefs" value="PCMU,PCMA"/>
+      <param name="outbound-codec-prefs" value="PCMU,PCMA"/>
+    </settings>
+  </profile>
+</include>
