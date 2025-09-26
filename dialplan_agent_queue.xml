@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+FreeSWITCH 人工坐席队列拨号计划配置
+功能：定义呼叫路由规则，队列接入点，坐席管理接入点
+作者：AI Assistant
+版本：1.0
+
+安装说明：
+1. 将此文件复制到 /usr/local/freeswitch/conf/dialplan/default/ 目录
+2. 重新加载拨号计划：fs_cli -x "reloadxml"
+-->
+
+<include>
+  <context name="default">
+    
+    <!-- 客服队列接入 - 拨打 8000 进入默认队列 -->
+    <extension name="customer_service_queue">
+      <condition field="destination_number" expression="^8000$">
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="set" data="continue_on_fail=true"/>
+        <action application="playback" data="ivr/ivr-welcome_to_customer_service.wav"/>
+        <action application="lua" data="agent_queue.lua default"/>
+      </condition>
+    </extension>
+
+    <!-- 技术支持队列 - 拨打 8001 -->
+    <extension name="tech_support_queue">
+      <condition field="destination_number" expression="^8001$">
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="set" data="continue_on_fail=true"/>
+        <action application="playbook" data="ivr/ivr-welcome_to_tech_support.wav"/>
+        <action application="lua" data="agent_queue.lua tech_support technical"/>
+      </condition>
+    </extension>
+
+    <!-- 销售队列 - 拨打 8002 -->
+    <extension name="sales_queue">
+      <condition field="destination_number" expression="^8002$">
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="set" data="continue_on_fail=true"/>
+        <action application="playback" data="ivr/ivr-welcome_to_sales.wav"/>
+        <action application="lua" data="agent_queue.lua sales sales"/>
+      </condition>
+    </extension>
+
+    <!-- VIP客户队列 - 拨打 8003 -->
+    <extension name="vip_queue">
+      <condition field="destination_number" expression="^8003$">
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="set" data="continue_on_fail=true"/>
+        <action application="playback" data="ivr/ivr-welcome_vip_customer.wav"/>
+        <action application="lua" data="agent_queue.lua vip vip"/>
+      </condition>
+    </extension>
+
+    <!-- 坐席登录 - 拨打 9000 + 分机号 -->
+    <extension name="agent_login">
+      <condition field="destination_number" expression="^9000(\d{3,4})$">
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="playback" data="ivr/ivr-agent_login.wav"/>
+        <action application="lua" data="agent_management.lua login $1"/>
+      </condition>
+    </extension>
+
+    <!-- 坐席登出 - 拨打 9001 + 分机号 -->
+    <extension name="agent_logout">
+      <condition field="destination_number" expression="^9001(\d{3,4})$">
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="lua" data="agent_management.lua logout $1"/>
+      </condition>
+    </extension>
+
+    <!-- 坐席状态管理菜单 - 拨打 9999 -->
+    <extension name="agent_menu">
+      <condition field="destination_number" expression="^9999$">
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="playback" data="ivr/ivr-agent_menu_welcome.wav"/>
+        <action application="lua" data="agent_management.lua menu ${caller_id_number}"/>
+      </condition>
+    </extension>
+
+    <!-- 队列统计查询 - 拨打 9998 -->
+    <extension name="queue_stats">
+      <condition field="destination_number" expression="^9998$">
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="playback" data="ivr/ivr-queue_statistics.wav"/>
+        <action application="lua" data="queue_stats.lua"/>
+      </condition>
+    </extension>
+
+    <!-- 紧急呼叫转接 - 拨打 911 转接到管理员 -->
+    <extension name="emergency_transfer">
+      <condition field="destination_number" expression="^911$">
+        <action application="answer"/>
+        <action application="playback" data="ivr/ivr-emergency_transfer.wav"/>
+        <action application="bridge" data="user/admin@${domain_name}"/>
+      </condition>
+    </extension>
+
+    <!-- 直接转接到坐席 - 拨打 8 + 坐席分机号 -->
+    <extension name="direct_agent_transfer">
+      <condition field="destination_number" expression="^8(\d{3,4})$">
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="set" data="continue_on_fail=true"/>
+        <action application="bridge" data="{call_timeout=30}user/$1@${domain_name}"/>
+        <action application="playback" data="ivr/ivr-agent_not_available.wav"/>
+        <action application="transfer" data="8000"/>
+      </condition>
+    </extension>
+
+    <!-- 外呼回调处理 -->
+    <extension name="outbound_callback">
+      <condition field="destination_number" expression="^callback_(\d+)$">
+        <action application="set" data="effective_caller_id_number=${outbound_caller_id_number}"/>
+        <action application="set" data="effective_caller_id_name=${outbound_caller_id_name}"/>
+        <action application="bridge" data="sofia/gateway/provider/$1"/>
+      </condition>
+    </extension>
+
+    <!-- 会议室功能 - 拨打 3000 + 会议室号 -->
+    <extension name="conference_rooms">
+      <condition field="destination_number" expression="^3000(\d{1,3})$">
+        <action application="answer"/>
+        <action application="conference" data="conf_$1@default"/>
+      </condition>
+    </extension>
+
+    <!-- 语音信箱 - 拨打 5000 + 分机号 -->
+    <extension name="voicemail">
+      <condition field="destination_number" expression="^5000(\d{3,4})$">
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="voicemail" data="default ${domain_name} $1"/>
+      </condition>
+    </extension>
+
+    <!-- 录音播放 - 拨打 6000 + 录音ID -->
+    <extension name="playback_recording">
+      <condition field="destination_number" expression="^6000(\d+)$">
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="playback" data="/usr/local/freeswitch/recordings/$1.wav"/>
+      </condition>
+    </extension>
+
+    <!-- 系统状态检查 - 拨打 7777 -->
+    <extension name="system_status">
+      <condition field="destination_number" expression="^7777$">
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="lua" data="system_status.lua"/>
+      </condition>
+    </extension>
+
+    <!-- 测试回音 - 拨打 9196 -->
+    <extension name="echo_test">
+      <condition field="destination_number" expression="^9196$">
+        <action application="answer"/>
+        <action application="echo"/>
+      </condition>
+    </extension>
+
+    <!-- 音乐播放测试 - 拨打 9195 -->
+    <extension name="music_test">
+      <condition field="destination_number" expression="^9195$">
+        <action application="answer"/>
+        <action application="playback" data="local_stream://moh"/>
+      </condition>
+    </extension>
+
+  </context>
+
+  <!-- 公共上下文 - 用于外部呼入 -->
+  <context name="public">
+    
+    <!-- 外部呼入路由到客服队列 -->
+    <extension name="public_inbound">
+      <condition field="destination_number" expression="^(.*)$">
+        <action application="set" data="domain_name=${sip_req_host}"/>
+        <action application="transfer" data="8000 XML default"/>
+      </condition>
+    </extension>
+
+  </context>
+
+</include>
