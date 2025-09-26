@@ -1,0 +1,126 @@
+version: '3.8'
+
+services:
+  # MySQL数据库
+  mysql:
+    image: mysql:8.0
+    container_name: fs-robot-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: fs_robot_call
+      MYSQL_USER: fsrobot
+      MYSQL_PASSWORD: fsrobot123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - fs-network
+
+  # Redis缓存
+  redis:
+    image: redis:7-alpine
+    container_name: fs-robot-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - fs-network
+
+  # FreeSWITCH
+  freeswitch:
+    image: drachtio/freeswitch-grpc:latest
+    container_name: fs-robot-freeswitch
+    environment:
+      FREESWITCH_PASSWORD: ClueCon
+    ports:
+      - "8021:8021"  # Event Socket
+      - "5060:5060/tcp"  # SIP TCP
+      - "5060:5060/udp"  # SIP UDP
+      - "5080:5080/tcp"  # SIP External
+      - "5080:5080/udp"  # SIP External
+      - "16384-32768:16384-32768/udp"  # RTP
+    volumes:
+      - ./freeswitch/conf:/etc/freeswitch
+      - ./freeswitch/sounds:/usr/share/freeswitch/sounds
+      - ./freeswitch/recordings:/var/lib/freeswitch/recordings
+    networks:
+      - fs-network
+
+  # Node.js应用
+  app:
+    build: .
+    container_name: fs-robot-app
+    depends_on:
+      - mysql
+      - redis
+      - freeswitch
+    environment:
+      # FreeSWITCH配置
+      FS_HOST: freeswitch
+      FS_PORT: 8021
+      FS_PASSWORD: ClueCon
+      FS_SIP_PROFILE: external
+      
+      # 数据库配置
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: fs_robot_call
+      DB_USER: fsrobot
+      DB_PASSWORD: fsrobot123
+      
+      # Redis配置
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      
+      # 语音服务配置（需要替换为实际的密钥）
+      ALI_ACCESS_KEY_ID: ${ALI_ACCESS_KEY_ID}
+      ALI_ACCESS_KEY_SECRET: ${ALI_ACCESS_KEY_SECRET}
+      ALI_APP_KEY: ${ALI_APP_KEY}
+      ALI_TTS_APP_KEY: ${ALI_TTS_APP_KEY}
+      
+      # 服务器配置
+      SERVER_PORT: 3000
+      WS_PORT: 3001
+      JWT_SECRET: your_jwt_secret_key_here_change_in_production
+      
+      # 外呼配置
+      OUTBOUND_CALLER_ID: +8613800138000
+      OUTBOUND_GATEWAY: default_gateway
+      MAX_CONCURRENT_CALLS: 100
+    ports:
+      - "3000:3000"  # HTTP API
+      - "3001:3001"  # WebSocket
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    networks:
+      - fs-network
+    restart: unless-stopped
+
+  # Nginx反向代理（可选）
+  nginx:
+    image: nginx:alpine
+    container_name: fs-robot-nginx
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    networks:
+      - fs-network
+
+networks:
+  fs-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
