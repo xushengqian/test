@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  # PostgreSQL数据库
+  postgres:
+    image: postgres:15
+    container_name: fs_robot_postgres
+    environment:
+      POSTGRES_DB: robot_call_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - fs_robot_network
+
+  # Redis缓存
+  redis:
+    image: redis:7-alpine
+    container_name: fs_robot_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - fs_robot_network
+
+  # FreeSwitch
+  freeswitch:
+    image: drachtio/freeswitch:latest
+    container_name: fs_robot_freeswitch
+    ports:
+      - "5060:5060/udp"
+      - "5080:5080/udp"
+      - "8021:8021"
+      - "16384-16394:16384-16394/udp"
+    volumes:
+      - ../freeswitch/conf:/usr/local/freeswitch/conf
+      - ../freeswitch/scripts:/usr/local/freeswitch/scripts
+      - freeswitch_recordings:/var/lib/freeswitch/recordings
+    environment:
+      - FREESWITCH_PASSWORD=ClueCon
+    networks:
+      - fs_robot_network
+    depends_on:
+      - postgres
+      - redis
+
+  # 后端API服务
+  backend:
+    build:
+      context: ../backend
+      dockerfile: ../docker/Dockerfile.backend
+    container_name: fs_robot_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/robot_call_db
+      - REDIS_URL=redis://redis:6379/0
+      - FREESWITCH_HOST=freeswitch
+      - FREESWITCH_PORT=8021
+      - FREESWITCH_PASSWORD=ClueCon
+    volumes:
+      - freeswitch_recordings:/var/lib/freeswitch/recordings
+    networks:
+      - fs_robot_network
+    depends_on:
+      - postgres
+      - redis
+      - freeswitch
+    restart: unless-stopped
+
+  # 前端界面
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../docker/Dockerfile.frontend
+    container_name: fs_robot_frontend
+    ports:
+      - "3000:80"
+    networks:
+      - fs_robot_network
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # Nginx反向代理
+  nginx:
+    image: nginx:alpine
+    container_name: fs_robot_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    networks:
+      - fs_robot_network
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  freeswitch_recordings:
+
+networks:
+  fs_robot_network:
+    driver: bridge
