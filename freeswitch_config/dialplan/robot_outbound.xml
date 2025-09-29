@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FreeSWITCH 机器人外呼配置 -->
+<include>
+  <!-- 机器人外呼上下文 -->
+  <context name="robot_outbound">
+    
+    <!-- 发起外呼 -->
+    <extension name="initiate_outbound_call">
+      <condition field="destination_number" expression="^robot_call_(\d+)$">
+        <!-- 设置通话变量 -->
+        <action application="set" data="call_uuid=${create_uuid()}"/>
+        <action application="set" data="customer_number=$1"/>
+        <action application="set" data="robot_active=true"/>
+        <action application="set" data="agent_joined=false"/>
+        <action application="set" data="hangup_after_bridge=false"/>
+        <action application="set" data="continue_on_fail=true"/>
+        
+        <!-- 记录通话 -->
+        <action application="set" data="RECORD_STEREO=true"/>
+        <action application="set" data="media_bug_answer_req=true"/>
+        <action application="record_session" data="/var/freeswitch/recordings/${strftime(%Y-%m-%d-%H-%M-%S)}_${call_uuid}.wav"/>
+        
+        <!-- 创建会议室用于后续坐席接入 -->
+        <action application="set" data="conference_name=conf_${call_uuid}"/>
+        
+        <!-- 呼叫客户 -->
+        <action application="bridge" data="{origination_caller_id_number=4008888888,origination_caller_id_name=ServiceBot}sofia/external/$1@your_sip_provider"/>
+        
+        <!-- 客户接听后执行 -->
+        <action application="lua" data="robot_handler.lua ${call_uuid}"/>
+      </condition>
+    </extension>
+    
+    <!-- 坐席接入会议 -->
+    <extension name="agent_join_conference">
+      <condition field="destination_number" expression="^agent_join_(\S+)$">
+        <action application="set" data="conference_uuid=$1"/>
+        <action application="answer"/>
+        <action application="set" data="conference_member_flags=moderator"/>
+        
+        <!-- 播放提示音给坐席 -->
+        <action application="playback" data="tone_stream://%(200,100,500);%(200,100,400)"/>
+        
+        <!-- 加入会议 -->
+        <action application="conference" data="conf_$1@robot_conference+flags{moderator|endconf}"/>
+      </condition>
+    </extension>
+    
+    <!-- 客户端进入会议 -->
+    <extension name="customer_conference_bridge">
+      <condition field="destination_number" expression="^customer_conf_(\S+)$">
+        <action application="set" data="conference_uuid=$1"/>
+        
+        <!-- 客户加入会议 -->
+        <action application="conference" data="conf_$1@robot_conference+flags{mute|deaf}"/>
+      </condition>
+    </extension>
+    
+  </context>
+  
+  <!-- 会议配置文件 -->
+  <context name="robot_conference">
+    <extension name="conference_config">
+      <condition field="destination_number" expression="^conf_(.+)$">
+        <!-- 会议室设置 -->
+        <action application="set" data="conference_auto_outcall_timeout=30"/>
+        <action application="set" data="conference_max_members=3"/>
+        <action application="set" data="conference_endconf_grace_time=300"/>
+        
+        <!-- 进入会议 -->
+        <action application="conference" data="$1"/>
+      </condition>
+    </extension>
+  </context>
+</include>
