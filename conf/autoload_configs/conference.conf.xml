@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration name="conference.conf" description="Audio Conference">
+  
+  <!-- 机器人外呼会议配置 -->
+  <profiles>
+    <profile name="robot_call_profile">
+      <param name="domain" value="$${domain}"/>
+      <param name="rate" value="8000"/>
+      <param name="interval" value="20"/>
+      <param name="energy-level" value="300"/>
+      
+      <!-- 录音设置 -->
+      <param name="auto-record" value="/var/recordings/conf_${conference_name}_${strftime(%Y%m%d_%H%M%S)}.wav"/>
+      
+      <!-- 会议控制 -->
+      <param name="caller-controls" value="robot_call_controls"/>
+      <param name="moderator-controls" value="agent_controls"/>
+      
+      <!-- 音频设置 -->
+      <param name="comfort-noise" value="true"/>
+      <param name="moh-sound" value="local_stream://moh"/>
+      <param name="enter-sound" value="tone_stream://%(200,0,500,600,700)"/>
+      <param name="exit-sound" value="tone_stream://%(500,0,300,200,100,50,25)"/>
+    </profile>
+  </profiles>
+  
+  <!-- 控制按键定义 -->
+  <caller-controls>
+    <!-- 客户控制（基本功能） -->
+    <group name="robot_call_controls">
+      <control action="mute" digits="*1"/>
+      <control action="deaf mute" digits="*2"/>
+      <control action="energy up" digits="*3"/>
+      <control action="energy equ" digits="*4"/>
+      <control action="energy dn" digits="*5"/>
+      <control action="hangup" digits="#"/>
+    </group>
+    
+    <!-- 坐席控制（完整功能） -->
+    <group name="agent_controls">
+      <control action="mute" digits="*1"/>
+      <control action="mute" digits="0"/>
+      <control action="deaf mute" digits="*2"/>
+      <control action="energy up" digits="*3"/>
+      <control action="energy equ" digits="*4"/>
+      <control action="energy dn" digits="*5"/>
+      <control action="vol talk up" digits="*7"/>
+      <control action="vol talk zero" digits="*8"/>
+      <control action="vol talk dn" digits="*9"/>
+      <control action="vol listen up" digits="7"/>
+      <control action="vol listen zero" digits="8"/>
+      <control action="vol listen dn" digits="9"/>
+      <control action="hangup" digits="#"/>
+      <!-- 踢出客户 -->
+      <control action="kick" digits="*0"/>
+    </group>
+  </caller-controls>
+  
+</configuration>

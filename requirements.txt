@@ -1,0 +1,43 @@
+# FreeSWITCH机器人外呼系统依赖包
+
+# Web框架
+Flask==2.3.3
+Flask-CORS==4.0.0
+
+# FreeSWITCH ESL客户端
+python-ESL==1.0.0
+
+# 数据库
+sqlite3
+
+# HTTP客户端
+requests==2.31.0
+
+# JSON处理
+json5==0.9.14
+
+# 日志
+logging
+
+# 时间处理
+python-dateutil==2.8.2
+
+# UUID生成
+uuid
+
+# 系统工具
+psutil==5.9.5
+
+# 音频处理（可选，用于TTS/ASR）
+pydub==0.25.1
+SpeechRecognition==3.10.0
+
+# WebSocket支持（用于实时通知）
+Flask-SocketIO==5.3.6
+python-socketio==5.8.0
+
+# 配置文件处理
+PyYAML==6.0.1
+
+# 加密和安全
+cryptography==41.0.4

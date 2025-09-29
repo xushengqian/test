@@ -1,0 +1,108 @@
+# FreeSWITCH机器人外呼系统配置文件
+
+# FreeSWITCH配置
+freeswitch:
+  host: "localhost"
+  esl_port: 8021
+  esl_password: "ClueCon"
+  sounds_path: "/usr/share/freeswitch/sounds"
+  recordings_path: "/var/recordings"
+  scripts_path: "/usr/share/freeswitch/scripts"
+
+# 数据库配置
+database:
+  type: "sqlite"
+  path: "robot_calls.db"
+  backup_interval: 3600  # 备份间隔（秒）
+
+# API服务配置
+api:
+  host: "0.0.0.0"
+  port: 8080
+  debug: true
+  cors_enabled: true
+
+# 机器人配置
+robot:
+  # 语音识别配置
+  asr:
+    engine: "pocketsphinx"  # 可选: pocketsphinx, baidu, aliyun
+    language: "zh-CN"
+    timeout: 5000  # 毫秒
+    
+  # 文本转语音配置
+  tts:
+    engine: "espeak"  # 可选: espeak, baidu, aliyun
+    voice: "zh"
+    speed: 150
+    temp_path: "/tmp"
+    
+  # 对话配置
+  conversation:
+    max_silence_time: 10  # 最大静默时间（秒）
+    max_conversation_time: 300  # 最大对话时间（秒）
+    transfer_keywords: ["人工", "转接", "客服", "服务"]
+    
+  # 默认话术
+  scripts:
+    default: "您好！我是智能客服机器人，很高兴为您服务。请问有什么可以帮助您的吗？"
+    product: "您好！我是产品顾问机器人，今天向您推荐我们的优质产品。"
+    survey: "您好！我是客服机器人，想了解一下您对我们服务的满意度。"
+    reminder: "您好！这是缴费提醒，您有一笔费用需要处理。"
+
+# 坐席配置
+agents:
+  default_extension_prefix: "10"  # 默认分机号前缀
+  max_concurrent_calls: 3  # 每个坐席最大并发通话数
+  auto_release_timeout: 1800  # 自动释放超时时间（秒）
+
+# 通话配置
+calls:
+  max_duration: 1800  # 最大通话时长（秒）
+  recording_enabled: true
+  recording_format: "wav"
+  auto_cleanup_days: 30  # 自动清理天数
+
+# 网关配置（需要根据实际情况修改）
+gateways:
+  default:
+    name: "your_gateway"
+    host: "your.sip.provider.com"
+    port: 5060
+    username: "your_username"
+    password: "your_password"
+    register: true
+
+# 日志配置
+logging:
+  level: "INFO"
+  file: "/var/log/robot_calls/system.log"
+  max_size: "10MB"
+  backup_count: 5
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# 监控配置
+monitoring:
+  enabled: true
+  metrics_interval: 60  # 指标收集间隔（秒）
+  health_check_interval: 30  # 健康检查间隔（秒）
+
+# 安全配置
+security:
+  api_key_required: false  # 是否需要API密钥
+  rate_limit: 100  # 每分钟请求限制
+  allowed_origins: ["*"]  # CORS允许的源
+
+# 通知配置
+notifications:
+  email:
+    enabled: false
+    smtp_server: "smtp.example.com"
+    smtp_port: 587
+    username: "your_email@example.com"
+    password: "your_password"
+    
+  webhook:
+    enabled: false
+    url: "https://your.webhook.url"
+    timeout: 5
