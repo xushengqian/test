@@ -1,0 +1,97 @@
+{
+  "freeswitch": {
+    "esl": {
+      "host": "localhost",
+      "port": 8021,
+      "password": "ClueCon"
+    },
+    "sip": {
+      "provider": "your_sip_provider",
+      "caller_id_number": "4008888888",
+      "caller_id_name": "ServiceBot"
+    },
+    "recording": {
+      "enabled": true,
+      "path": "/var/freeswitch/recordings",
+      "format": "wav"
+    }
+  },
+  "robot": {
+    "tts": {
+      "engine": "flite",
+      "voice": "kal",
+      "alternative_engines": {
+        "baidu": {
+          "api_key": "",
+          "secret_key": "",
+          "voice": "0"
+        },
+        "ali": {
+          "access_key": "",
+          "access_secret": "",
+          "voice": "xiaoyun"
+        }
+      }
+    },
+    "asr": {
+      "engine": "pocketsphinx",
+      "language": "zh-CN",
+      "alternative_engines": {
+        "baidu": {
+          "api_key": "",
+          "secret_key": "",
+          "dev_pid": "1537"
+        },
+        "ali": {
+          "access_key": "",
+          "access_secret": "",
+          "model": "chat"
+        }
+      }
+    },
+    "behavior": {
+      "welcome_message": "您好，我是智能客服助手，很高兴为您服务。请问有什么可以帮助您的吗？",
+      "silence_threshold": 3,
+      "silence_prompt": "您还在吗？如果需要帮助请随时告诉我。",
+      "transfer_keywords": ["人工", "转接", "客服", "坐席"],
+      "auto_transfer_on_negative": true
+    }
+  },
+  "websocket": {
+    "server": {
+      "host": "0.0.0.0",
+      "port": 8765
+    },
+    "heartbeat_interval": 30,
+    "reconnect_attempts": 5
+  },
+  "web_interface": {
+    "server": {
+      "host": "0.0.0.0",
+      "port": 8080
+    },
+    "auth": {
+      "enabled": false,
+      "username": "admin",
+      "password": "admin123"
+    }
+  },
+  "agent": {
+    "auto_assign": false,
+    "skill_based_routing": false,
+    "max_concurrent_calls": 5,
+    "wrap_up_time": 30,
+    "default_status": "ready"
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "/var/log/robot_outbound.log",
+    "max_size": "100MB",
+    "backup_count": 5
+  },
+  "monitoring": {
+    "metrics_enabled": false,
+    "prometheus_port": 9090,
+    "health_check_endpoint": "/health"
+  }
+}

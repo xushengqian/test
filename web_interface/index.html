@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreeSWITCH 坐席控制面板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .header h1::before {
+            content: "📞";
+            margin-right: 12px;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border-radius: 20px;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.connected {
+            background: #4ade80;
+        }
+        
+        .status-dot.disconnected {
+            background: #ef4444;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .panel h2::before {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        
+        .outbound-panel h2::before {
+            content: "🚀";
+        }
+        
+        .calls-panel h2::before {
+            content: "📋";
+        }
+        
+        .agent-info-panel h2::before {
+            content: "👤";
+        }
+        
+        .controls-panel h2::before {
+            content: "⚙️";
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(74, 222, 128, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .call-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .call-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+        }
+        
+        .call-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+        
+        .call-item.agent-talking {
+            border-left-color: #4ade80;
+        }
+        
+        .call-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .call-number {
+            font-weight: 600;
+            color: #333;
+            font-size: 18px;
+        }
+        
+        .call-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-robot {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+        
+        .status-agent {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        
+        .call-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .call-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .agent-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .agent-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .agent-info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .agent-info-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .agent-info-value {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert.show {
+            display: block;
+        }
+        
+        .alert-success {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #86efac;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>坐席控制面板</h1>
+            <div class="status-indicator">
+                <span class="status-dot disconnected" id="connectionStatus"></span>
+                <span id="connectionText">未连接</span>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- 左侧面板 -->
+            <div>
+                <!-- 外呼面板 -->
+                <div class="panel outbound-panel">
+                    <h2>发起外呼</h2>
+                    <div class="alert alert-success" id="callAlert"></div>
+                    <form id="outboundForm">
+                        <div class="form-group">
+                            <label for="customerNumber">客户号码</label>
+                            <input type="tel" id="customerNumber" placeholder="请输入客户手机号码" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <span>📞</span>
+                            <span>发起呼叫</span>
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- 坐席信息 -->
+                <div class="panel agent-info-panel" style="margin-top: 30px;">
+                    <h2>坐席信息</h2>
+                    <div class="agent-info">
+                        <div class="agent-info-item">
+                            <span class="agent-info-label">坐席ID</span>
+                            <span class="agent-info-value" id="agentId">Agent001</span>
+                        </div>
+                        <div class="agent-info-item">
+                            <span class="agent-info-label">坐席号码</span>
+                            <span class="agent-info-value" id="agentNumber">1001</span>
+                        </div>
+                        <div class="agent-info-item">
+                            <span class="agent-info-label">状态</span>
+                            <span class="agent-info-value" id="agentStatus">就绪</span>
+                        </div>
+                        <div class="agent-info-item">
+                            <span class="agent-info-label">今日接听</span>
+                            <span class="agent-info-value" id="callCount">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 控制面板 -->
+                <div class="panel controls-panel" style="margin-top: 30px;">
+                    <h2>快捷控制</h2>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        <button class="btn btn-success" onclick="setAgentReady()">
+                            <span>✅</span>
+                            <span>就绪</span>
+                        </button>
+                        <button class="btn btn-danger" onclick="setAgentBusy()">
+                            <span>🚫</span>
+                            <span>忙碌</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧面板 -->
+            <div class="panel calls-panel">
+                <h2>当前通话列表</h2>
+                <div class="call-list" id="callList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>暂无进行中的通话</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // WebSocket连接
+        let ws = null;
+        let reconnectInterval = null;
+        let callCount = 0;
+        
+        // 坐席信息
+        const agentInfo = {
+            id: 'Agent001',
+            number: '1001',
+            status: 'ready'
+        };
+        
+        // 连接WebSocket
+        function connectWebSocket() {
+            const wsUrl = 'ws://localhost:8765';
+            
+            try {
+                ws = new WebSocket(wsUrl);
+                
+                ws.onopen = function() {
+                    console.log('WebSocket连接成功');
+                    updateConnectionStatus(true);
+                    
+                    // 清除重连定时器
+                    if (reconnectInterval) {
+                        clearInterval(reconnectInterval);
+                        reconnectInterval = null;
+                    }
+                    
+                    // 请求当前通话列表
+                    ws.send(JSON.stringify({
+                        type: 'get_calls'
+                    }));
+                };
+                
+                ws.onmessage = function(event) {
+                    const message = JSON.parse(event.data);
+                    handleWebSocketMessage(message);
+                };
+                
+                ws.onerror = function(error) {
+                    console.error('WebSocket错误:', error);
+                    updateConnectionStatus(false);
+                };
+                
+                ws.onclose = function() {
+                    console.log('WebSocket连接关闭');
+                    updateConnectionStatus(false);
+                    
+                    // 自动重连
+                    if (!reconnectInterval) {
+                        reconnectInterval = setInterval(connectWebSocket, 5000);
+                    }
+                };
+            } catch (error) {
+                console.error('WebSocket连接失败:', error);
+                updateConnectionStatus(false);
+            }
+        }
+        
+        // 处理WebSocket消息
+        function handleWebSocketMessage(message) {
+            switch (message.type) {
+                case 'call_list':
+                    updateCallList(message.data);
+                    break;
+                case 'call_initiated':
+                    handleCallInitiated(message);
+                    break;
+                case 'agent_joined':
+                    handleAgentJoined(message);
+                    break;
+                case 'call_update':
+                    updateCallList(message.data);
+                    break;
+            }
+        }
+        
+        // 更新连接状态
+        function updateConnectionStatus(connected) {
+            const statusDot = document.getElementById('connectionStatus');
+            const statusText = document.getElementById('connectionText');
+            
+            if (connected) {
+                statusDot.className = 'status-dot connected';
+                statusText.textContent = '已连接';
+            } else {
+                statusDot.className = 'status-dot disconnected';
+                statusText.textContent = '未连接';
+            }
+        }
+        
+        // 更新通话列表
+        function updateCallList(calls) {
+            const callListElement = document.getElementById('callList');
+            
+            if (!calls || calls.length === 0) {
+                callListElement.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>暂无进行中的通话</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            calls.forEach(call => {
+                const statusClass = call.status === 'agent_talking' ? 'agent-talking' : '';
+                const statusLabel = call.status === 'agent_talking' ? '坐席通话中' : '机器人通话中';
+                const statusBadgeClass = call.status === 'agent_talking' ? 'status-agent' : 'status-robot';
+                
+                html += `
+                    <div class="call-item ${statusClass}">
+                        <div class="call-item-header">
+                            <span class="call-number">${call.customer_number}</span>
+                            <span class="call-status ${statusBadgeClass}">${statusLabel}</span>
+                        </div>
+                        <div class="call-info">
+                            <div>UUID: ${call.uuid.substring(0, 8)}...</div>
+                            <div>时长: ${getCallDuration(call.start_time)}</div>
+                        </div>
+                        <div class="call-actions">
+                            ${call.status === 'robot_talking' ? 
+                                `<button class="btn btn-success" onclick="joinCall('${call.uuid}')">
+                                    <span>🎧</span>
+                                    <span>接入通话</span>
+                                </button>` : 
+                                `<button class="btn btn-danger" onclick="hangupCall('${call.uuid}')">
+                                    <span>📵</span>
+                                    <span>挂断</span>
+                                </button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            });
+            
+            callListElement.innerHTML = html;
+        }
+        
+        // 计算通话时长
+        function getCallDuration(startTime) {
+            const start = new Date(startTime);
+            const now = new Date();
+            const diff = Math.floor((now - start) / 1000);
+            
+            const minutes = Math.floor(diff / 60);
+            const seconds = diff % 60;
+            
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // 发起外呼
+        document.getElementById('outboundForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const customerNumber = document.getElementById('customerNumber').value;
+            
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                showAlert('请先连接到服务器', 'error');
+                return;
+            }
+            
+            ws.send(JSON.stringify({
+                type: 'initiate_call',
+                customer_number: customerNumber
+            }));
+            
+            document.getElementById('customerNumber').value = '';
+        });
+        
+        // 处理呼叫发起响应
+        function handleCallInitiated(message) {
+            if (message.success) {
+                showAlert('呼叫已发起，请等待客户接听', 'success');
+            } else {
+                showAlert('呼叫发起失败，请重试', 'error');
+            }
+        }
+        
+        // 坐席接入通话
+        function joinCall(callUuid) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                showAlert('请先连接到服务器', 'error');
+                return;
+            }
+            
+            ws.send(JSON.stringify({
+                type: 'agent_join',
+                call_uuid: callUuid,
+                agent_id: agentInfo.id,
+                agent_number: agentInfo.number
+            }));
+        }
+        
+        // 处理坐席接入响应
+        function handleAgentJoined(message) {
+            if (message.success) {
+                callCount++;
+                document.getElementById('callCount').textContent = callCount;
+                showAlert('成功接入通话', 'success');
+            } else {
+                showAlert('接入失败，请重试', 'error');
+            }
+        }
+        
+        // 挂断通话
+        function hangupCall(callUuid) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                showAlert('请先连接到服务器', 'error');
+                return;
+            }
+            
+            ws.send(JSON.stringify({
+                type: 'hangup_call',
+                call_uuid: callUuid
+            }));
+        }
+        
+        // 设置坐席就绪
+        function setAgentReady() {
+            agentInfo.status = 'ready';
+            document.getElementById('agentStatus').textContent = '就绪';
+            showAlert('坐席状态已设置为就绪', 'success');
+        }
+        
+        // 设置坐席忙碌
+        function setAgentBusy() {
+            agentInfo.status = 'busy';
+            document.getElementById('agentStatus').textContent = '忙碌';
+            showAlert('坐席状态已设置为忙碌', 'success');
+        }
+        
+        // 显示提示消息
+        function showAlert(message, type) {
+            const alert = document.getElementById('callAlert');
+            alert.textContent = message;
+            alert.className = `alert alert-${type} show`;
+            
+            setTimeout(() => {
+                alert.className = 'alert';
+            }, 3000);
+        }
+        
+        // 定期更新通话时长
+        setInterval(() => {
+            // 如果有通话，请求更新
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'get_calls'
+                }));
+            }
+        }, 5000);
+        
+        // 页面加载时连接WebSocket
+        window.addEventListener('load', function() {
+            connectWebSocket();
+        });
+    </script>
+</body>
+</html>
