@@ -1,0 +1,27 @@
+# 日志清理定时任务配置示例
+# 将以下内容添加到crontab中（使用 crontab -e 命令）
+
+# 每天凌晨2:00执行日志清理
+0 2 * * * /workspace/clear_logs.sh >> /var/log/clear_logs_cron.log 2>&1
+
+# 其他时间选项示例：
+# 每天凌晨0:00执行
+# 0 0 * * * /workspace/clear_logs.sh >> /var/log/clear_logs_cron.log 2>&1
+
+# 每天凌晨3:30执行
+# 30 3 * * * /workspace/clear_logs.sh >> /var/log/clear_logs_cron.log 2>&1
+
+# 每周一凌晨1:00执行
+# 0 1 * * 1 /workspace/clear_logs.sh >> /var/log/clear_logs_cron.log 2>&1
+
+# 每月1号凌晨4:00执行
+# 0 4 1 * * /workspace/clear_logs.sh >> /var/log/clear_logs_cron.log 2>&1
+
+# Cron时间格式说明：
+# ┌───────────── 分钟 (0 - 59)
+# │ ┌───────────── 小时 (0 - 23)
+# │ │ ┌───────────── 日期 (1 - 31)
+# │ │ │ ┌───────────── 月份 (1 - 12)
+# │ │ │ │ ┌───────────── 星期 (0 - 7) (0 或 7 是周日)
+# │ │ │ │ │
+# * * * * * 命令
