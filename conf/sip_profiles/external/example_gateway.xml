@@ -1,0 +1,38 @@
+<!-- 示例SIP网关配置 -->
+<include>
+  <gateway name="example_provider">
+    <!-- 网关基本信息 -->
+    <param name="username" value="your_username"/>
+    <param name="password" value="your_password"/>
+    <param name="realm" value="your.sip.provider.com"/>
+    <param name="proxy" value="your.sip.provider.com"/>
+    <param name="register" value="true"/>
+    
+    <!-- 连接参数 -->
+    <param name="retry-seconds" value="30"/>
+    <param name="expire-seconds" value="600"/>
+    <param name="caller-id-in-from" value="false"/>
+    
+    <!-- 编解码器设置 -->
+    <param name="codec-prefs" value="PCMU,PCMA,G729"/>
+    
+    <!-- 外呼前缀（可选） -->
+    <param name="prefix" value=""/>
+    
+    <!-- 并发通话限制 -->
+    <param name="max-calls" value="100"/>
+    
+    <!-- 网络设置 -->
+    <param name="register-transport" value="udp"/>
+    <param name="contact-params" value=""/>
+    
+    <!-- 认证设置 -->
+    <param name="auth-username" value="your_username"/>
+    <param name="from-user" value="your_username"/>
+    <param name="from-domain" value="your.sip.provider.com"/>
+    
+    <!-- 高级设置 -->
+    <param name="ping" value="25"/>
+    <param name="extension-in-contact" value="true"/>
+  </gateway>
+</include>

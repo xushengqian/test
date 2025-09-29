@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<include>
+  <!-- 机器人外呼拨号计划 -->
+  <context name="outbound_robot">
+    
+    <!-- 机器人外呼入口 -->
+    <extension name="robot_outbound_call">
+      <condition field="destination_number" expression="^robot_call_(\d+)$">
+        <action application="set" data="customer_number=$1"/>
+        <action application="set" data="call_direction=outbound"/>
+        <action application="set" data="robot_session_id=${uuid}"/>
+        <action application="set" data="call_state=robot_active"/>
+        
+        <!-- 设置通话录音 -->
+        <action application="set" data="RECORD_TITLE=Robot_Call_${customer_number}_${strftime(%Y%m%d_%H%M%S)}"/>
+        <action application="set" data="RECORD_COPYRIGHT=Robot Call System"/>
+        <action application="record_session" data="/var/recordings/${RECORD_TITLE}.wav"/>
+        
+        <!-- 启动机器人对话 -->
+        <action application="lua" data="robot_handler.lua"/>
+        
+        <!-- 如果需要转人工，跳转到人工接入流程 -->
+        <action application="transfer" data="human_takeover XML outbound_robot"/>
+      </condition>
+    </extension>
+    
+    <!-- 人工坐席接入处理 -->
+    <extension name="human_takeover">
+      <condition field="destination_number" expression="^human_takeover$">
+        <!-- 暂停机器人 -->
+        <action application="set" data="call_state=human_pending"/>
+        <action application="lua" data="pause_robot.lua"/>
+        
+        <!-- 播放等待音乐给客户 -->
+        <action application="set" data="hold_music=local_stream://moh"/>
+        <action application="playback" data="tone_stream://%(2000,4000,440,480)"/>
+        
+        <!-- 呼叫人工坐席 -->
+        <action application="bridge" data="{origination_caller_id_number=${customer_number},origination_uuid=${create_uuid()}}user/agent_${agent_id}"/>
+        
+        <!-- 如果坐席接听，建立三方通话 -->
+        <action application="lua" data="setup_conference.lua"/>
+      </condition>
+    </extension>
+    
+    <!-- 坐席接入后的会议室 -->
+    <extension name="agent_conference">
+      <condition field="destination_number" expression="^conf_(\w+)$">
+        <action application="set" data="conference_id=$1"/>
+        <action application="conference" data="${conference_id}@robot_call_profile"/>
+      </condition>
+    </extension>
+    
+  </context>
+</include>
