@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    # 使用H2内存数据库进行演示
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+    
+    # MySQL配置示例（如果需要使用MySQL，取消注释下面的配置）
+    # url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    # driver-class-name: com.mysql.cj.jdbc.Driver
+    # username: root
+    # password: 123456
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 打印SQL日志
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+      # 全局更新策略配置
+      update-strategy: not_null  # 默认策略：NOT_NULL（只更新非null字段）
+      # update-strategy: ignored  # 如果设置为IGNORED，则会更新所有字段（包括null）
+
+logging:
+  level:
+    com.example.mapper: debug
