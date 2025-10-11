@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FreeSWITCH 坐席用户配置 -->
+<include>
+  <user id="agent_001">
+    <params>
+      <param name="password" value="1234"/>
+      <param name="vm-password" value="1234"/>
+      <param name="http-allowed-api" value="true"/>
+    </params>
+    <variables>
+      <variable name="toll_allow" value="domestic,international,local"/>
+      <variable name="accountcode" value="agent_001"/>
+      <variable name="user_context" value="default"/>
+      <variable name="effective_caller_id_name" value="Agent Zhang San"/>
+      <variable name="effective_caller_id_number" value="1001"/>
+      <variable name="outbound_caller_id_name" value="Customer Service"/>
+      <variable name="outbound_caller_id_number" value="4001234567"/>
+      <variable name="callgroup" value="agents"/>
+      <variable name="agent_skills" value="sales,general"/>
+      <variable name="agent_level" value="3"/>
+    </variables>
+  </user>
+  
+  <user id="agent_002">
+    <params>
+      <param name="password" value="1234"/>
+      <param name="vm-password" value="1234"/>
+      <param name="http-allowed-api" value="true"/>
+    </params>
+    <variables>
+      <variable name="toll_allow" value="domestic,international,local"/>
+      <variable name="accountcode" value="agent_002"/>
+      <variable name="user_context" value="default"/>
+      <variable name="effective_caller_id_name" value="Agent Li Si"/>
+      <variable name="effective_caller_id_number" value="1002"/>
+      <variable name="outbound_caller_id_name" value="Customer Service"/>
+      <variable name="outbound_caller_id_number" value="4001234567"/>
+      <variable name="callgroup" value="agents"/>
+      <variable name="agent_skills" value="support,general"/>
+      <variable name="agent_level" value="2"/>
+    </variables>
+  </user>
+  
+  <user id="agent_003">
+    <params>
+      <param name="password" value="1234"/>
+      <param name="vm-password" value="1234"/>
+      <param name="http-allowed-api" value="true"/>
+    </params>
+    <variables>
+      <variable name="toll_allow" value="domestic,international,local"/>
+      <variable name="accountcode" value="agent_003"/>
+      <variable name="user_context" value="default"/>
+      <variable name="effective_caller_id_name" value="Agent Wang Wu"/>
+      <variable name="effective_caller_id_number" value="1003"/>
+      <variable name="outbound_caller_id_name" value="Customer Service"/>
+      <variable name="outbound_caller_id_number" value="4001234567"/>
+      <variable name="callgroup" value="agents,supervisors"/>
+      <variable name="agent_skills" value="complaint,general"/>
+      <variable name="agent_level" value="5"/>
+    </variables>
+  </user>
+  
+  <user id="agent_004">
+    <params>
+      <param name="password" value="1234"/>
+      <param name="vm-password" value="1234"/>
+      <param name="http-allowed-api" value="true"/>
+    </params>
+    <variables>
+      <variable name="toll_allow" value="domestic,international,local"/>
+      <variable name="accountcode" value="agent_004"/>
+      <variable name="user_context" value="default"/>
+      <variable name="effective_caller_id_name" value="Agent Zhao Liu"/>
+      <variable name="effective_caller_id_number" value="1004"/>
+      <variable name="outbound_caller_id_name" value="Customer Service"/>
+      <variable name="outbound_caller_id_number" value="4001234567"/>
+      <variable name="callgroup" value="agents"/>
+      <variable name="agent_skills" value="sales,support"/>
+      <variable name="agent_level" value="4"/>
+    </variables>
+  </user>
+  
+  <user id="agent_005">
+    <params>
+      <param name="password" value="1234"/>
+      <param name="vm-password" value="1234"/>
+      <param name="http-allowed-api" value="true"/>
+    </params>
+    <variables>
+      <variable name="toll_allow" value="domestic,international,local"/>
+      <variable name="accountcode" value="agent_005"/>
+      <variable name="user_context" value="default"/>
+      <variable name="effective_caller_id_name" value="Agent Qian Qi"/>
+      <variable name="effective_caller_id_number" value="1005"/>
+      <variable name="outbound_caller_id_name" value="Customer Service"/>
+      <variable name="outbound_caller_id_number" value="4001234567"/>
+      <variable name="callgroup" value="agents"/>
+      <variable name="agent_skills" value="general"/>
+      <variable name="agent_level" value="1"/>
+    </variables>
+  </user>
+</include>
