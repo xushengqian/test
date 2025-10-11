@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<include>
+  <context name="public">
+    <!-- 主要的转人工拨号计划 -->
+    <extension name="transfer_to_human_intent">
+      <condition field="destination_number" expression="^(customer_service|support|human_agent)$">
+        <action application="set" data="call_timeout=30"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="set" data="continue_on_fail=true"/>
+        
+        <!-- 设置呼叫者信息 -->
+        <action application="set" data="caller_id_name=${caller_id_name}"/>
+        <action application="set" data="caller_id_number=${caller_id_number}"/>
+        
+        <!-- 执行用户意图识别脚本 -->
+        <action application="lua" data="intent_detection.lua"/>
+        
+        <!-- 如果检测到转人工意图，执行转移 -->
+        <action application="transfer" data="human_queue XML queue"/>
+      </condition>
+    </extension>
+
+    <!-- 处理来电的主入口 -->
+    <extension name="incoming_call_handler">
+      <condition field="destination_number" expression="^(\d{10,11})$">
+        <!-- 记录呼叫开始时间 -->
+        <action application="set" data="call_start_time=${strftime(%Y-%m-%d %H:%M:%S)}"/>
+        <action application="log" data="INFO 新来电: ${caller_id_number} -> ${destination_number}"/>
+        
+        <!-- 播放欢迎语音 -->
+        <action application="playback" data="sounds/welcome.wav"/>
+        
+        <!-- 启动语音识别和意图检测 -->
+        <action application="lua" data="voice_intent_processor.lua"/>
+      </condition>
+    </extension>
+
+    <!-- 紧急转人工快捷方式 -->
+    <extension name="emergency_human_transfer">
+      <condition field="destination_number" expression="^(0|emergency)$">
+        <action application="log" data="NOTICE 紧急转人工: ${caller_id_number}"/>
+        <action application="transfer" data="priority_human_queue XML queue"/>
+      </condition>
+    </extension>
+  </context>
+
+  <!-- 人工客服队列上下文 -->
+  <context name="queue">
+    <extension name="human_queue">
+      <condition field="destination_number" expression="^human_queue$">
+        <!-- 设置队列参数 -->
+        <action application="set" data="fifo_music=sounds/hold_music.wav"/>
+        <action application="set" data="fifo_announce_sound=sounds/queue_position.wav"/>
+        
+        <!-- 记录进入队列时间 -->
+        <action application="set" data="queue_enter_time=${strftime(%Y-%m-%d %H:%M:%S)}"/>
+        <action application="log" data="INFO 用户进入人工队列: ${caller_id_number}"/>
+        
+        <!-- 进入FIFO队列等待人工客服 -->
+        <action application="fifo" data="human_agents_queue in"/>
+      </condition>
+    </extension>
+
+    <!-- 优先级人工队列 -->
+    <extension name="priority_human_queue">
+      <condition field="destination_number" expression="^priority_human_queue$">
+        <action application="set" data="fifo_priority=10"/>
+        <action application="log" data="NOTICE 用户进入优先队列: ${caller_id_number}"/>
+        <action application="fifo" data="human_agents_queue in"/>
+      </condition>
+    </extension>
+
+    <!-- 人工客服接听 -->
+    <extension name="agent_login">
+      <condition field="destination_number" expression="^agent_(\d+)$">
+        <action application="set" data="agent_id=$1"/>
+        <action application="log" data="INFO 客服 ${agent_id} 上线"/>
+        
+        <!-- 客服从队列中取呼叫 -->
+        <action application="fifo" data="human_agents_queue out nowait"/>
+      </condition>
+    </extension>
+  </context>
+</include>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FreeSwitch 人工客服队列配置 -->
+<configuration name="fifo.conf" description="FIFO Configuration">
+  
+  <settings>
+    <!-- 全局FIFO设置 -->
+    <param name="delete-all-outbound-member-on-startup" value="true"/>
+    <param name="outbound-strategy" value="ringall"/>
+  </settings>
+
+  <!-- 人工客服主队列 -->
+  <fifos>
+    <fifo name="human_agents_queue@$${domain}" importance="0">
+      <!-- 队列基本参数 -->
+      <param name="importance" value="0"/>
+      <param name="announce-sound" value="sounds/queue_announcement.wav"/>
+      <param name="announce-frequency" value="30"/>
+      <param name="caller-id-name" value="CustomerService"/>
+      <param name="caller-id-number" value="400-800-0000"/>
+      
+      <!-- 等候音乐和提示音 -->
+      <param name="moh-sound" value="sounds/hold_music.wav"/>
+      <param name="hold-music" value="sounds/hold_music.wav"/>
+      <param name="chime-list" value="sounds/queue_chime.wav"/>
+      <param name="chime-freq" value="30"/>
+      
+      <!-- 队列行为设置 -->
+      <param name="outbound-strategy" value="enterprise"/>
+      <param name="outbound-name" value="human_agents"/>
+      <param name="timeout" value="60"/>
+      <param name="retry-delay" value="5"/>
+      <param name="consumer-exit-key" value="#"/>
+      
+      <!-- 队列统计和监控 -->
+      <param name="record-template" value="recordings/queue_${caller_id_number}_${strftime(%Y%m%d_%H%M%S)}.wav"/>
+      
+      <!-- 队列成员管理 -->
+      <members>
+        <!-- 预定义的人工客服分机 -->
+        <member timeout="30" simo="1" lag="5">{call_timeout=30}user/agent_001@$${domain}</member>
+        <member timeout="30" simo="1" lag="5">{call_timeout=30}user/agent_002@$${domain}</member>
+        <member timeout="30" simo="1" lag="5">{call_timeout=30}user/agent_003@$${domain}</member>
+        <member timeout="30" simo="1" lag="5">{call_timeout=30}user/agent_004@$${domain}</member>
+        <member timeout="30" simo="1" lag="5">{call_timeout=30}user/agent_005@$${domain}</member>
+      </members>
+    </fifo>
+
+    <!-- 优先级队列（VIP客户/紧急情况） -->
+    <fifo name="priority_agents_queue@$${domain}" importance="10">
+      <param name="importance" value="10"/>
+      <param name="announce-sound" value="sounds/priority_queue_announcement.wav"/>
+      <param name="announce-frequency" value="20"/>
+      
+      <param name="moh-sound" value="sounds/priority_hold_music.wav"/>
+      <param name="chime-freq" value="20"/>
+      
+      <param name="outbound-strategy" value="ringall"/>
+      <param name="timeout" value="45"/>
+      <param name="retry-delay" value="3"/>
+      
+      <!-- 优先级队列成员（高级客服） -->
+      <members>
+        <member timeout="25" simo="2" lag="0">{call_timeout=25}user/senior_agent_001@$${domain}</member>
+        <member timeout="25" simo="2" lag="0">{call_timeout=25}user/senior_agent_002@$${domain}</member>
+        <member timeout="30" simo="1" lag="10">{call_timeout=30}user/agent_001@$${domain}</member>
+      </members>
+    </fifo>
+
+    <!-- 技术支持专用队列 -->
+    <fifo name="technical_support_queue@$${domain}" importance="5">
+      <param name="importance" value="5"/>
+      <param name="announce-sound" value="sounds/technical_queue_announcement.wav"/>
+      <param name="announce-frequency" value="45"/>
+      
+      <param name="moh-sound" value="sounds/technical_hold_music.wav"/>
+      <param name="outbound-strategy" value="enterprise"/>
+      <param name="timeout" value="90"/>
+      
+      <members>
+        <member timeout="45" simo="1" lag="5">{call_timeout=45}user/tech_support_001@$${domain}</member>
+        <member timeout="45" simo="1" lag="5">{call_timeout=45}user/tech_support_002@$${domain}</member>
+        <member timeout="60" simo="1" lag="15">{call_timeout=60}user/agent_001@$${domain}</member>
+      </members>
+    </fifo>
+
+    <!-- 投诉处理队列 -->
+    <fifo name="complaint_queue@$${domain}" importance="8">
+      <param name="importance" value="8"/>
+      <param name="announce-sound" value="sounds/complaint_queue_announcement.wav"/>
+      <param name="announce-frequency" value="25"/>
+      
+      <param name="moh-sound" value="sounds/complaint_hold_music.wav"/>
+      <param name="outbound-strategy" value="ringall"/>
+      <param name="timeout" value="30"/>
+      <param name="retry-delay" value="2"/>
+      
+      <!-- 投诉队列需要录音 -->
+      <param name="record-template" value="recordings/complaint_${caller_id_number}_${strftime(%Y%m%d_%H%M%S)}.wav"/>
+      
+      <members>
+        <member timeout="20" simo="2" lag="0">{call_timeout=20}user/complaint_handler_001@$${domain}</member>
+        <member timeout="20" simo="2" lag="0">{call_timeout=20}user/complaint_handler_002@$${domain}</member>
+        <member timeout="30" simo="1" lag="10">{call_timeout=30}user/senior_agent_001@$${domain}</member>
+      </members>
+    </fifo>
+
+    <!-- 夜间/非工作时间队列 -->
+    <fifo name="after_hours_queue@$${domain}" importance="3">
+      <param name="importance" value="3"/>
+      <param name="announce-sound" value="sounds/after_hours_announcement.wav"/>
+      <param name="announce-frequency" value="60"/>
+      
+      <param name="moh-sound" value="sounds/after_hours_music.wav"/>
+      <param name="outbound-strategy" value="enterprise"/>
+      <param name="timeout" value="120"/>
+      
+      <members>
+        <member timeout="60" simo="1" lag="10">{call_timeout=60}user/night_agent_001@$${domain}</member>
+        <member timeout="90" simo="1" lag="30">{call_timeout=90}user/oncall_agent_001@$${domain}</member>
+      </members>
+    </fifo>
+  </fifos>
+</configuration>

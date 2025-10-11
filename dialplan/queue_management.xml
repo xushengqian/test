@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 队列成员管理和监控配置 -->
+<include>
+  <!-- 客服代理上线拨号计划 -->
+  <context name="agent_management">
+    
+    <!-- 普通客服上线 -->
+    <extension name="agent_login">
+      <condition field="destination_number" expression="^agent_login_(\d+)$">
+        <action application="set" data="agent_id=$1"/>
+        <action application="set" data="agent_login_time=${strftime(%Y-%m-%d %H:%M:%S)}"/>
+        
+        <!-- 验证客服身份 -->
+        <action application="lua" data="agent_authentication.lua"/>
+        
+        <!-- 如果验证通过，加入队列 -->
+        <action application="set" data="fifo_member_wait=nowait"/>
+        <action application="fifo" data="human_agents_queue@$${domain} out"/>
+        
+        <!-- 记录上线日志 -->
+        <action application="log" data="NOTICE 客服 ${agent_id} 已上线"/>
+        <action application="event" data="Event-Name=CUSTOM,Event-Subclass=agent::login,Agent-ID=${agent_id}"/>
+      </condition>
+    </extension>
+
+    <!-- 高级客服上线 -->
+    <extension name="senior_agent_login">
+      <condition field="destination_number" expression="^senior_agent_login_(\d+)$">
+        <action application="set" data="agent_id=senior_$1"/>
+        <action application="set" data="agent_level=senior"/>
+        
+        <action application="lua" data="agent_authentication.lua"/>
+        
+        <!-- 同时加入多个队列 -->
+        <action application="fifo" data="priority_agents_queue@$${domain} out nowait"/>
+        <action application="fifo" data="human_agents_queue@$${domain} out nowait"/>
+        
+        <action application="log" data="NOTICE 高级客服 ${agent_id} 已上线"/>
+      </condition>
+    </extension>
+
+    <!-- 客服下线 -->
+    <extension name="agent_logout">
+      <condition field="destination_number" expression="^agent_logout_(\d+)$">
+        <action application="set" data="agent_id=$1"/>
+        <action application="set" data="agent_logout_time=${strftime(%Y-%m-%d %H:%M:%S)}"/>
+        
+        <!-- 从所有队列中移除 -->
+        <action application="fifo" data="human_agents_queue@$${domain} out stop"/>
+        <action application="fifo" data="priority_agents_queue@$${domain} out stop"/>
+        <action application="fifo" data="technical_support_queue@$${domain} out stop"/>
+        <action application="fifo" data="complaint_queue@$${domain} out stop"/>
+        
+        <!-- 记录下线日志 -->
+        <action application="log" data="NOTICE 客服 ${agent_id} 已下线"/>
+        <action application="event" data="Event-Name=CUSTOM,Event-Subclass=agent::logout,Agent-ID=${agent_id}"/>
+        
+        <action application="playback" data="sounds/logout_successful.wav"/>
+      </condition>
+    </extension>
+
+    <!-- 客服状态切换 -->
+    <extension name="agent_status_change">
+      <condition field="destination_number" expression="^agent_status_(\d+)_(.+)$">
+        <action application="set" data="agent_id=$1"/>
+        <action application="set" data="new_status=$2"/>
+        
+        <!-- 执行状态切换脚本 -->
+        <action application="lua" data="agent_status_manager.lua"/>
+        
+        <action application="log" data="INFO 客服 ${agent_id} 状态切换为 ${new_status}"/>
+      </condition>
+    </extension>
+
+    <!-- 队列统计查询 -->
+    <extension name="queue_stats">
+      <condition field="destination_number" expression="^queue_stats_(.+)$">
+        <action application="set" data="queue_name=$1"/>
+        <action application="lua" data="queue_statistics.lua"/>
+      </condition>
+    </extension>
+
+    <!-- 紧急广播给所有在线客服 -->
+    <extension name="emergency_broadcast">
+      <condition field="destination_number" expression="^emergency_broadcast$">
+        <action application="set" data="broadcast_message=${caller_id_name}"/>
+        <action application="lua" data="emergency_broadcast.lua"/>
+        <action application="log" data="ALERT 紧急广播已发送"/>
+      </condition>
+    </extension>
+  </context>
+
+  <!-- 队列路由上下文 -->  
+  <context name="queue_routing">
+    
+    <!-- 智能队列路由 -->
+    <extension name="smart_queue_routing">
+      <condition field="destination_number" expression="^smart_route$">
+        <!-- 获取当前时间和客户信息 -->
+        <action application="set" data="current_hour=${strftime(%H)}"/>
+        <action application="set" data="current_dow=${strftime(%u)}"/>  <!-- 1=Monday, 7=Sunday -->
+        
+        <!-- 执行智能路由脚本 -->
+        <action application="lua" data="smart_queue_router.lua"/>
+      </condition>
+    </extension>
+
+    <!-- 基于意图的队列分配 -->
+    <extension name="intent_based_routing">
+      <condition field="destination_number" expression="^intent_route$">
+        <action application="set" data="detected_intent=${detected_intent}"/>
+        <action application="set" data="intent_category=${intent_category}"/>
+        <action application="set" data="caller_priority=${caller_priority}"/>
+        
+        <!-- 技术支持意图 -->
+        <action application="transfer" data="technical_support_queue XML queue" inline="true">
+          <condition field="${intent_category}" expression="^technical$"/>
+        </action>
+        
+        <!-- 投诉意图 -->
+        <action application="transfer" data="complaint_queue XML queue" inline="true">
+          <condition field="${intent_category}" expression="^complaint$"/>
+        </action>
+        
+        <!-- VIP客户或紧急情况 -->
+        <action application="transfer" data="priority_agents_queue XML queue" inline="true">
+          <condition field="${caller_priority}" expression="^(high|vip|emergency)$"/>
+        </action>
+        
+        <!-- 默认转到普通人工队列 -->
+        <action application="transfer" data="human_agents_queue XML queue"/>
+      </condition>
+    </extension>
+
+    <!-- 溢出处理 -->
+    <extension name="queue_overflow">
+      <condition field="destination_number" expression="^overflow_(.+)$">
+        <action application="set" data="original_queue=$1"/>
+        <action application="log" data="WARN 队列 ${original_queue} 溢出，执行溢出处理"/>
+        
+        <!-- 播放溢出提示 -->
+        <action application="playback" data="sounds/queue_busy_overflow.wav"/>
+        
+        <!-- 提供选择：继续等待或留言 -->
+        <action application="read" data="2 3 sounds/press_1_wait_2_voicemail.wav overflow_choice 5000 #"/>
+        
+        <!-- 处理用户选择 -->
+        <action application="transfer" data="continue_waiting XML queue" inline="true">
+          <condition field="${overflow_choice}" expression="^1$"/>
+        </action>
+        
+        <action application="transfer" data="voicemail_system XML default" inline="true">
+          <condition field="${overflow_choice}" expression="^2$"/>
+        </action>
+        
+        <!-- 默认继续等待 -->
+        <action application="transfer" data="human_agents_queue XML queue"/>
+      </condition>
+    </extension>
+  </context>
+</include>
