@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FreeSWITCH FIFO配置 - 用于坐席队列管理 -->
+<configuration name="fifo.conf" description="FIFO Configuration">
+  <settings>
+    <!-- 全局设置 -->
+    <param name="delete-all-outbound-member-on-startup" value="false"/>
+    <param name="outbound-strategy" value="ringall"/>
+  </settings>
+  
+  <fifos>
+    <!-- 通用坐席队列 -->
+    <fifo name="agent_queue@$${domain}" importance="0">
+      <!-- 队列音乐 -->
+      <param name="announce-sound" value="tone_stream://%(2000,4000,440,480)"/>
+      <param name="music" value="local_stream://moh"/>
+      
+      <!-- 队列播报设置 -->
+      <param name="announce-frequency" value="30"/>
+      <param name="announce-sound" value="ivr/ivr-you_are_number.wav"/>
+      <param name="announce-position" value="yes"/>
+      
+      <!-- 超时设置 -->
+      <param name="timeout" value="300"/>
+      <param name="max-wait" value="600"/>
+      
+      <!-- 队列策略 -->
+      <param name="strategy" value="longest-idle-agent"/>
+      <param name="ring-timeout" value="20"/>
+      
+      <!-- 坐席呼叫设置 -->
+      <param name="outbound-delay" value="0"/>
+      <param name="outbound-priority" value="5"/>
+      
+      <!-- 队列容量 -->
+      <param name="max" value="50"/>
+    </fifo>
+    
+    <!-- 销售坐席队列 -->
+    <fifo name="sales_queue@$${domain}" importance="0">
+      <param name="announce-sound" value="tone_stream://%(2000,4000,440,480)"/>
+      <param name="music" value="local_stream://moh"/>
+      <param name="announce-frequency" value="20"/>
+      <param name="announce-sound" value="ivr/ivr-you_are_number.wav"/>
+      <param name="timeout" value="300"/>
+      <param name="strategy" value="longest-idle-agent"/>
+      <param name="max" value="30"/>
+    </fifo>
+    
+    <!-- 技术支持队列 -->
+    <fifo name="support_queue@$${domain}" importance="0">
+      <param name="announce-sound" value="tone_stream://%(2000,4000,440,480)"/>
+      <param name="music" value="local_stream://moh"/>
+      <param name="announce-frequency" value="25"/>
+      <param name="announce-sound" value="ivr/ivr-you_are_number.wav"/>
+      <param name="timeout" value="300"/>
+      <param name="strategy" value="round-robin"/>
+      <param name="max" value="40"/>
+    </fifo>
+    
+    <!-- 投诉处理队列 -->
+    <fifo name="complaint_queue@$${domain}" importance="0">
+      <param name="announce-sound" value="tone_stream://%(2000,4000,440,480)"/>
+      <param name="music" value="local_stream://moh"/>
+      <param name="announce-frequency" value="15"/>
+      <param name="announce-sound" value="ivr/ivr-you_are_number.wav"/>
+      <param name="timeout" value="600"/>
+      <param name="strategy" value="top-down"/>
+      <param name="max" value="20"/>
+      <!-- 投诉队列优先级更高 -->
+      <param name="outbound-priority" value="10"/>
+    </fifo>
+    
+    <!-- VIP客户专属队列 -->
+    <fifo name="vip_queue@$${domain}" importance="10">
+      <param name="announce-sound" value="tone_stream://%(1000,2000,440)"/>
+      <param name="music" value="local_stream://vip_moh"/>
+      <param name="announce-frequency" value="10"/>
+      <param name="announce-sound" value="ivr/ivr-vip_queue_position.wav"/>
+      <param name="timeout" value="180"/>
+      <param name="strategy" value="longest-idle-agent"/>
+      <param name="max" value="10"/>
+      <!-- VIP队列最高优先级 -->
+      <param name="outbound-priority" value="20"/>
+    </fifo>
+    
+    <!-- 紧急队列 -->
+    <fifo name="emergency_queue@$${domain}" importance="20">
+      <param name="announce-sound" value="tone_stream://%(500,500,640)"/>
+      <param name="music" value="silence"/>
+      <param name="timeout" value="60"/>
+      <param name="strategy" value="ring-all"/>
+      <param name="max" value="5"/>
+      <param name="outbound-priority" value="30"/>
+    </fifo>
+  </fifos>
+</configuration>

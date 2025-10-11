@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FreeSWITCH 转人工拨号计划配置 -->
+<include>
+  <context name="transfer_to_agent">
+    
+    <!-- 转人工意图检测 -->
+    <extension name="detect_transfer_intent">
+      <condition field="destination_number" expression="^detect_intent$">
+        <!-- 执行意图检测脚本 -->
+        <action application="lua" data="scripts/detect_transfer_intent.lua"/>
+      </condition>
+    </extension>
+    
+    <!-- 用户请求转人工 -->
+    <extension name="user_transfer_to_agent">
+      <condition field="destination_number" expression="^(transfer_agent|转人工|人工服务|0)$">
+        <!-- 设置变量 -->
+        <action application="set" data="transfer_reason=user_request"/>
+        <action application="set" data="caller_id=${caller_id_number}"/>
+        <action application="set" data="transfer_time=${strftime(%Y-%m-%d %H:%M:%S)}"/>
+        
+        <!-- 播放转接提示音 -->
+        <action application="playback" data="ivr/ivr-transfer_to_agent.wav"/>
+        
+        <!-- 执行转人工逻辑 -->
+        <action application="lua" data="scripts/transfer_to_agent.lua"/>
+      </condition>
+    </extension>
+    
+    <!-- 坐席队列配置 -->
+    <extension name="agent_queue">
+      <condition field="destination_number" expression="^agent_queue$">
+        <!-- 加入坐席队列 -->
+        <action application="set" data="fifo_music=$${hold_music}"/>
+        <action application="set" data="fifo_orbit_exten=transfer_agent:90"/>
+        
+        <!-- 检查可用坐席 -->
+        <action application="lua" data="scripts/check_available_agents.lua"/>
+        
+        <!-- 加入FIFO队列 -->
+        <action application="fifo" data="agent_queue@${domain_name} in"/>
+      </condition>
+    </extension>
+    
+    <!-- 坐席接听 -->
+    <extension name="agent_answer">
+      <condition field="destination_number" expression="^agent_(\d+)$">
+        <action application="set" data="agent_id=$1"/>
+        
+        <!-- 坐席签入 -->
+        <action application="lua" data="scripts/agent_login.lua ${agent_id}"/>
+        
+        <!-- 从队列取出呼叫 -->
+        <action application="fifo" data="agent_queue@${domain_name} out nowait"/>
+      </condition>
+    </extension>
+    
+    <!-- 转接失败处理 -->
+    <extension name="transfer_failed">
+      <condition field="destination_number" expression="^transfer_failed$">
+        <action application="playback" data="ivr/ivr-no_agents_available.wav"/>
+        <action application="lua" data="scripts/handle_transfer_failure.lua"/>
+      </condition>
+    </extension>
+    
+  </context>
+</include>
