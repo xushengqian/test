@@ -1,0 +1,126 @@
+<!-- 数据库和缓存性能优化配置 -->
+<configuration name="db.conf" description="Database Configuration">
+  
+  <!-- SQLite 优化（如果使用 SQLite） -->
+  <settings>
+    <!-- 使用内存数据库或 tmpfs -->
+    <param name="core-db-name" value="/dev/shm/freeswitch/db/core.db"/>
+    <param name="call-detail-db-name" value="/dev/shm/freeswitch/db/call_detail.db"/>
+    <param name="sofia-db-name" value="/dev/shm/freeswitch/db/sofia_reg.db"/>
+    <param name="fifo-db-name" value="/dev/shm/freeswitch/db/fifo.db"/>
+    <param name="voicemail-db-name" value="/dev/shm/freeswitch/db/voicemail.db"/>
+    
+    <!-- 数据库缓存优化 -->
+    <param name="db-cache-size" value="50000"/>
+    <param name="db-max-cache-size" value="100000"/>
+    <param name="db-cache-ttl" value="3600"/>
+    
+    <!-- 连接池设置 -->
+    <param name="max-db-handles" value="100"/>
+    <param name="db-handle-timeout" value="10"/>
+    <param name="db-connection-timeout" value="5"/>
+    
+    <!-- 自动清理和维护 -->
+    <param name="auto-vacuum" value="FULL"/>
+    <param name="auto-vacuum-interval" value="10000"/>
+    <param name="auto-clear-sql" value="false"/>
+    <param name="auto-create-schemas" value="false"/>
+    
+    <!-- WAL 模式（Write-Ahead Logging）提高并发性能 -->
+    <param name="enable-wal-mode" value="true"/>
+    <param name="wal-checkpoint-interval" value="1000"/>
+    <param name="synchronous" value="NORMAL"/>
+    
+    <!-- 查询优化 -->
+    <param name="sql-max-retries" value="3"/>
+    <param name="sql-retry-delay" value="100"/>
+    <param name="max-sql-buffer-len" value="1048576"/>
+    
+    <!-- 索引优化 -->
+    <param name="enable-indexes" value="true"/>
+    <param name="create-indexes-on-startup" value="true"/>
+    
+    <!-- 批量操作优化 -->
+    <param name="batch-insert-size" value="100"/>
+    <param name="batch-update-size" value="100"/>
+    <param name="batch-delete-size" value="100"/>
+    
+    <!-- 事务优化 -->
+    <param name="transaction-isolation" value="READ_UNCOMMITTED"/>
+    <param name="enable-foreign-keys" value="false"/>
+    
+    <!-- 内存表设置 -->
+    <param name="temp-store" value="MEMORY"/>
+    <param name="temp-store-directory" value="/dev/shm/freeswitch/temp"/>
+  </settings>
+  
+  <!-- ODBC 配置（如果使用外部数据库） -->
+  <odbc>
+    <!-- PostgreSQL 示例 -->
+    <!--
+    <param name="odbc-dsn" value="pgsql://hostaddr=127.0.0.1 dbname=freeswitch user=freeswitch password=password connect_timeout=5"/>
+    -->
+    
+    <!-- MySQL 示例 -->
+    <!--
+    <param name="odbc-dsn" value="mysql://server=127.0.0.1;database=freeswitch;uid=freeswitch;pwd=password;option=67108864;connect_timeout=5"/>
+    -->
+    
+    <!-- 连接池配置 -->
+    <param name="max-connections" value="50"/>
+    <param name="min-connections" value="10"/>
+    <param name="connection-timeout" value="5"/>
+    <param name="idle-timeout" value="300"/>
+    <param name="busy-timeout" value="5000"/>
+    
+    <!-- 查询缓存 -->
+    <param name="enable-query-cache" value="true"/>
+    <param name="query-cache-size" value="10000"/>
+    <param name="query-cache-ttl" value="300"/>
+    
+    <!-- 预编译语句 -->
+    <param name="enable-prepared-statements" value="true"/>
+    <param name="prepared-statement-cache-size" value="500"/>
+  </odbc>
+  
+  <!-- Redis 缓存配置（可选） -->
+  <redis>
+    <param name="enabled" value="false"/>
+    <param name="hostname" value="127.0.0.1"/>
+    <param name="port" value="6379"/>
+    <param name="password" value=""/>
+    <param name="database" value="0"/>
+    <param name="timeout" value="5"/>
+    <param name="max-connections" value="50"/>
+    
+    <!-- 缓存策略 -->
+    <param name="cache-registrations" value="true"/>
+    <param name="cache-channels" value="true"/>
+    <param name="cache-presence" value="false"/>
+    <param name="cache-ttl" value="300"/>
+    
+    <!-- 性能优化 -->
+    <param name="pipeline-commands" value="true"/>
+    <param name="pipeline-size" value="100"/>
+    <param name="enable-keepalive" value="true"/>
+    <param name="keepalive-interval" value="30"/>
+  </redis>
+  
+  <!-- Memcached 缓存配置（可选） -->
+  <memcached>
+    <param name="enabled" value="false"/>
+    <param name="servers" value="127.0.0.1:11211"/>
+    <param name="max-connections" value="50"/>
+    
+    <!-- 缓存策略 -->
+    <param name="cache-sofia-reg" value="true"/>
+    <param name="cache-sofia-sub" value="false"/>
+    <param name="default-ttl" value="300"/>
+    
+    <!-- 性能优化 -->
+    <param name="compression" value="false"/>
+    <param name="binary-protocol" value="true"/>
+    <param name="no-delay" value="true"/>
+  </memcached>
+  
+</configuration>

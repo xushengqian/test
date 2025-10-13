@@ -1,0 +1,92 @@
+<!-- RTP 和媒体处理性能优化配置 -->
+<configuration name="switch.conf" description="Core Configuration">
+  
+  <settings>
+    <!-- RTP 端口范围优化 -->
+    <param name="rtp-start-port" value="16384"/>
+    <param name="rtp-end-port" value="32768"/>
+    <param name="rtp-port-usage-robustness" value="false"/>
+    
+    <!-- 媒体处理优化 -->
+    <param name="rtp-enable-zrtp" value="false"/>
+    <param name="rtp-autoflush-during-bridge" value="true"/>
+    <param name="rtp-rewrite-timestamps" value="true"/>
+    <param name="pass-rfc2833" value="true"/>
+    <param name="suppress-cng" value="true"/>
+    
+    <!-- Jitter Buffer 优化 -->
+    <param name="auto-jitterbuffer-msec" value="0"/>
+    <param name="max-jitterbuffer-msec" value="0"/>
+    <param name="jitterbuffer-during-bridge" value="false"/>
+    
+    <!-- 音频处理优化 -->
+    <param name="silence-threshold" value="0"/>
+    <param name="comfort-noise" value="false"/>
+    <param name="suppress-cng" value="true"/>
+    <param name="vad" value="none"/>
+    
+    <!-- 视频处理优化（如果不需要视频可以完全禁用） -->
+    <param name="video-no-media-timeout" value="300"/>
+    <param name="enable-video-rtcp" value="false"/>
+    
+    <!-- DTMF 处理优化 -->
+    <param name="rfc2833-pt" value="101"/>
+    <param name="dtmf-duration" value="2000"/>
+    <param name="min-dtmf-duration" value="100"/>
+    <param name="max-dtmf-duration" value="192000"/>
+    
+    <!-- 媒体代理优化 -->
+    <param name="media-proxy-mode" value="false"/>
+    <param name="media-proxy-if-nat" value="false"/>
+    <param name="bypass-media" value="true"/>
+    <param name="bypass-media-after-bridge" value="true"/>
+    <param name="proxy-media" value="false"/>
+    
+    <!-- 编解码器优化 -->
+    <param name="disable-transcoding" value="false"/>
+    <param name="codec-prefs" value="PCMU,PCMA,G722"/>
+    <param name="inbound-codec-prefs" value="PCMU,PCMA,G722"/>
+    <param name="outbound-codec-prefs" value="PCMU,PCMA,G722"/>
+    
+    <!-- 录音优化 -->
+    <param name="record-path" value="/dev/shm/freeswitch/recordings"/>
+    <param name="record-template" value="${uuid}.wav"/>
+    <param name="record-sample-rate" value="8000"/>
+    
+    <!-- 媒体超时设置 -->
+    <param name="media-timeout" value="300"/>
+    <param name="media-hold-timeout" value="1800"/>
+    <param name="rtp-timeout-sec" value="300"/>
+    <param name="rtp-hold-timeout-sec" value="1800"/>
+    
+    <!-- 线程池优化 -->
+    <param name="media-thread-priority" value="normal"/>
+    <param name="rtp-thread-priority" value="normal"/>
+    
+    <!-- 缓冲区优化 -->
+    <param name="read-buffer-size" value="2048"/>
+    <param name="write-buffer-size" value="2048"/>
+    <param name="video-buffer-size" value="2097152"/>
+    
+    <!-- NAT 穿透优化 -->
+    <param name="aggressive-nat-detection" value="false"/>
+    <param name="conservative-nat-detection" value="false"/>
+    <param name="NDLB-received-in-nat-reg-contact" value="false"/>
+    
+    <!-- ICE/STUN/TURN 优化（如果不需要WebRTC可以禁用） -->
+    <param name="ice-lite" value="false"/>
+    <param name="ice-aggressive" value="false"/>
+    <param name="stun-enabled" value="false"/>
+    <param name="stun-server" value=""/>
+    
+    <!-- 音频质量优化 -->
+    <param name="echo-cancellation" value="false"/>
+    <param name="noise-suppression" value="false"/>
+    <param name="auto-gain-control" value="false"/>
+    
+    <!-- 媒体缓存优化 -->
+    <param name="cache-dir" value="/dev/shm/freeswitch/cache"/>
+    <param name="temp-dir" value="/dev/shm/freeswitch/temp"/>
+  </settings>
+  
+</configuration>
