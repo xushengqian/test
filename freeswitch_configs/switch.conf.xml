@@ -1,0 +1,68 @@
+<!-- FreeSWITCH 核心性能优化配置 -->
+<configuration name="switch.conf" description="Core Configuration">
+  
+  <!-- CPU 核心优化设置 -->
+  <cli-keybindings>
+    <key name="1" value="help"/>
+    <key name="2" value="status"/>
+    <key name="3" value="show channels"/>
+    <key name="4" value="show calls"/>
+    <key name="5" value="sofia status"/>
+  </cli-keybindings>
+  
+  <settings>
+    <!-- 核心线程池优化 -->
+    <param name="max-sessions" value="10000"/>
+    <param name="sessions-per-second" value="500"/>
+    <param name="rtp-start-port" value="16384"/>
+    <param name="rtp-end-port" value="32768"/>
+    
+    <!-- CPU 亲和性设置 -->
+    <param name="core-db-auto-vacuum" value="10000"/>
+    <param name="core-db-cache-size" value="50000"/>
+    
+    <!-- 内存优化 -->
+    <param name="max-db-handles" value="100"/>
+    <param name="db-handle-timeout" value="10"/>
+    
+    <!-- 日志优化 - 生产环境建议降低日志级别 -->
+    <param name="loglevel" value="warning"/>
+    <param name="colorize-console" value="false"/>
+    
+    <!-- 核心定时器优化 -->
+    <param name="auto-create-schemas" value="false"/>
+    <param name="auto-clear-sql" value="false"/>
+    <param name="auto-use-timing" value="true"/>
+    
+    <!-- 减少磁盘 I/O -->
+    <param name="core-db-name" value="/dev/shm/freeswitch/db/core.db"/>
+    <param name="disable-monotonic-timing" value="false"/>
+    
+    <!-- RTP 优化 -->
+    <param name="rtp-enable-zrtp" value="false"/>
+    <param name="rtp-hold-timeout-sec" value="1800"/>
+    <param name="rtp-timeout-sec" value="300"/>
+    
+    <!-- 启用多核心支持 -->
+    <param name="enable-use-system-time" value="false"/>
+    <param name="initial-event-threads" value="8"/>
+    <param name="enable-clock-nanosleep" value="true"/>
+    
+    <!-- 媒体处理优化 -->
+    <param name="enable-sndfile-system" value="false"/>
+    <param name="max-audio-channels" value="256"/>
+    
+    <!-- 垃圾回收优化 -->
+    <param name="min-idle-cpu" value="10"/>
+    <param name="max-sql-buffer-len" value="1048576"/>
+    
+    <!-- 失败重试优化 -->
+    <param name="sql-max-retries" value="3"/>
+    
+    <!-- 会话限制 -->
+    <param name="min-dtmf-duration" value="100"/>
+    <param name="max-dtmf-duration" value="192000"/>
+    <param name="default-dtmf-duration" value="2000"/>
+  </settings>
+  
+</configuration>

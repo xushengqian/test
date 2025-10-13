@@ -1,0 +1,118 @@
+<!-- SIP Profile 性能优化配置 - Internal Profile -->
+<profile name="internal">
+  
+  <!-- 核心性能设置 -->
+  <settings>
+    <!-- 基础网络优化 -->
+    <param name="aggressive-nat-detection" value="false"/>
+    <param name="NDLB-received-in-nat-reg-contact" value="false"/>
+    <param name="nat-options-ping" value="false"/>
+    
+    <!-- RTP 和媒体优化 -->
+    <param name="disable-rtp-auto-adjust" value="false"/>
+    <param name="enable-100rel" value="false"/>
+    <param name="enable-compact-headers" value="true"/>
+    <param name="enable-timer" value="false"/>
+    <param name="minimum-session-expires" value="120"/>
+    
+    <!-- 连接池和线程优化 -->
+    <param name="user-agent-string" value="FreeSWITCH-Performance"/>
+    <param name="sip-port" value="5060"/>
+    <param name="sip-ip" value="$${local_ip_v4}"/>
+    <param name="rtp-ip" value="$${local_ip_v4}"/>
+    
+    <!-- 认证和安全优化 -->
+    <param name="auth-calls" value="false"/>
+    <param name="auth-all-packets" value="false"/>
+    <param name="challenge-realm" value="auto_from"/>
+    <param name="nonce-ttl" value="86400"/>
+    
+    <!-- 注册优化 -->
+    <param name="accept-blind-reg" value="false"/>
+    <param name="disable-register" value="false"/>
+    <param name="max-registrations-per-extension" value="5"/>
+    <param name="multiple-registrations" value="contact"/>
+    <param name="force-register-domain" value="$${domain}"/>
+    <param name="force-subscription-domain" value="$${domain}"/>
+    <param name="force-register-db-domain" value="$${domain}"/>
+    
+    <!-- 超时优化 -->
+    <param name="registration-thread-frequency" value="30"/>
+    <param name="expire-seconds" value="3600"/>
+    <param name="ping" value="60"/>
+    <param name="ping-max" value="3"/>
+    <param name="ping-min" value="1"/>
+    
+    <!-- 编解码器优化 -->
+    <param name="inbound-codec-prefs" value="PCMU,PCMA,G722"/>
+    <param name="outbound-codec-prefs" value="PCMU,PCMA,G722"/>
+    <param name="codec-prefs" value="PCMU,PCMA,G722"/>
+    <param name="inbound-late-negotiation" value="false"/>
+    <param name="inbound-codec-negotiation" value="generous"/>
+    <param name="disable-transcoding" value="false"/>
+    
+    <!-- DTMF 优化 -->
+    <param name="dtmf-type" value="rfc2833"/>
+    <param name="dtmf-duration" value="2000"/>
+    <param name="pass-rfc2833" value="true"/>
+    <param name="rfc2833-pt" value="101"/>
+    
+    <!-- 缓冲区优化 -->
+    <param name="rtp-timer-name" value="soft"/>
+    <param name="rtp-rewrite-timestamps" value="true"/>
+    <param name="suppress-cng" value="true"/>
+    
+    <!-- 会话管理优化 -->
+    <param name="manage-presence" value="false"/>
+    <param name="manage-shared-appearance" value="false"/>
+    <param name="presence-probe-on-register" value="false"/>
+    <param name="presence-hold-state" value="false"/>
+    
+    <!-- 连接重用 -->
+    <param name="enable-keepalive" value="true"/>
+    <param name="tcp-keepalive" value="30"/>
+    <param name="tcp-pingpong" value="30"/>
+    <param name="tcp-ping2pong" value="10"/>
+    
+    <!-- 消息队列优化 -->
+    <param name="sip-capture" value="no"/>
+    <param name="sip-trace" value="no"/>
+    <param name="log-auth-failures" value="false"/>
+    
+    <!-- TLS 优化（如果需要） -->
+    <param name="tls" value="false"/>
+    <param name="tls-only" value="false"/>
+    <param name="tls-verify-date" value="false"/>
+    <param name="tls-verify-depth" value="2"/>
+    
+    <!-- 媒体处理优化 -->
+    <param name="hold-music" value="local_stream://moh"/>
+    <param name="apply-nat-acl" value="nat.auto"/>
+    <param name="apply-inbound-acl" value="domains"/>
+    <param name="local-network-acl" value="localnet.auto"/>
+    <param name="record-path" value="/dev/shm/freeswitch/recordings"/>
+    <param name="record-template" value="${caller_id_number}.${target_domain}.${strftime(%Y-%m-%d-%H-%M-%S)}.wav"/>
+    
+    <!-- 额外性能调优 -->
+    <param name="context" value="public"/>
+    <param name="dialplan" value="XML"/>
+    <param name="disable-srv" value="true"/>
+    <param name="disable-naptr" value="true"/>
+    
+    <!-- 减少不必要的处理 -->
+    <param name="pass-callee-id" value="false"/>
+    <param name="caller-id-type" value="rpid"/>
+    <param name="privacy" value="none"/>
+    
+    <!-- 错误处理优化 -->
+    <param name="max-proceeding" value="1000"/>
+    <param name="max-resume-burst-rate" value="1000"/>
+    <param name="session-timeout-pt" value="1800"/>
+    
+    <!-- 启用异步处理 -->
+    <param name="async-system-thread" value="true"/>
+    <param name="fire-place-call-events" value="false"/>
+    <param name="send-silence-when-idle" value="true"/>
+  </settings>
+  
+</profile>

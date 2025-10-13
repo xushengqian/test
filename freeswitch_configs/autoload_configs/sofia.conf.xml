@@ -1,0 +1,74 @@
+<!-- Sofia SIP Stack 性能优化配置 -->
+<configuration name="sofia.conf" description="sofia Endpoint">
+  
+  <global_settings>
+    <!-- 核心性能参数 -->
+    <param name="log-level" value="0"/>
+    <param name="auto-restart" value="false"/>
+    <param name="debug-presence" value="0"/>
+    
+    <!-- 线程和并发优化 -->
+    <param name="max-reg-threads" value="8"/>
+    <param name="multiple-registrations" value="true"/>
+    <param name="max-connections" value="10000"/>
+    <param name="max-connections-per-ip" value="500"/>
+    
+    <!-- 内存和缓存优化 -->
+    <param name="hash-size" value="32768"/>
+    <param name="nat-cache-timeout" value="3600"/>
+    <param name="registration-cache-size" value="10000"/>
+    
+    <!-- 定时器优化 -->
+    <param name="sip-t1" value="500"/>
+    <param name="sip-t1x" value="32000"/>
+    <param name="sip-t2" value="4000"/>
+    <param name="sip-t4" value="4000"/>
+    
+    <!-- 数据库优化 -->
+    <param name="odbc-dsn" value=""/>
+    <param name="db-pooling" value="true"/>
+    <param name="db-max-connections" value="50"/>
+    
+    <!-- 事件处理优化 -->
+    <param name="presence-notify-rate" value="100"/>
+    <param name="sub-max-expiry" value="3600"/>
+    <param name="sub-min-expiry" value="60"/>
+    
+    <!-- 网络优化 -->
+    <param name="max-recv-buffer" value="65536"/>
+    <param name="enable-keepalive" value="true"/>
+    <param name="tcp-keepalive" value="30"/>
+    <param name="tcp-pingpong" value="30"/>
+    
+    <!-- RTP优化 -->
+    <param name="rtp-notimer-during-bridge" value="true"/>
+    <param name="rtp-autoflush-during-bridge" value="true"/>
+    <param name="rtp-rewrite-timestamps" value="true"/>
+    
+    <!-- 减少不必要的功能 -->
+    <param name="auto-jitterbuffer-msec" value="0"/>
+    <param name="enable-3pcc" value="false"/>
+    <param name="enable-timer" value="false"/>
+    
+    <!-- 故障转移和恢复 -->
+    <param name="auto-recovery-max-delay" value="30"/>
+    <param name="auto-recovery-min-delay" value="1"/>
+    
+    <!-- 事务处理优化 -->
+    <param name="max-tx" value="10000"/>
+    <param name="max-dialogs" value="10000"/>
+    
+    <!-- 减少DNS查询 -->
+    <param name="disable-srv" value="true"/>
+    <param name="disable-naptr" value="true"/>
+    <param name="timer-T1" value="500"/>
+    <param name="timer-T2" value="4000"/>
+    <param name="timer-T4" value="4000"/>
+  </global_settings>
+  
+  <profiles>
+    <!-- Profile 配置将引用 sip_profiles 目录下的文件 -->
+    <X-PRE-PROCESS cmd="include" data="sip_profiles/*.xml"/>
+  </profiles>
+  
+</configuration>
