@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FreeSWITCH 性能优化配置 -->
+<configuration name="switch.conf" description="Core Configuration">
+  <settings>
+    <!-- 性能相关的核心设置 -->
+    
+    <!-- 会话限制 - 根据硬件资源调整 -->
+    <param name="max-sessions" value="30000"/>
+    <param name="sessions-per-second" value="500"/>
+    
+    <!-- 内存管理优化 -->
+    <param name="core-db-name" value="/tmp/core.db"/>
+    <param name="use-heavy-synchronization" value="true"/>
+    <param name="enable-use-system-time" value="true"/>
+    
+    <!-- RTP 性能优化 -->
+    <param name="rtp-start-port" value="16384"/>
+    <param name="rtp-end-port" value="32767"/>
+    <param name="rtp-enable-zrtp" value="false"/>
+    
+    <!-- 线程池优化 -->
+    <param name="min-idle-cpu" value="25"/>
+    <param name="max-cpu-idle" value="0"/>
+    
+    <!-- 数据库连接池 -->
+    <param name="core-db-dsn" value="pgsql://hostaddr=127.0.0.1 dbname=freeswitch user=freeswitch password=''" />
+    
+    <!-- 日志级别优化 - 生产环境建议使用 NOTICE 或 WARNING -->
+    <param name="loglevel" value="info"/>
+    <param name="colorize-console" value="true"/>
+    
+    <!-- 安全和性能 -->
+    <param name="crash-protection" value="false"/>
+    <param name="mailer-app" value="sendmail"/>
+    <param name="mailer-app-args" value="-t"/>
+    <param name="dump-cores" value="yes"/>
+    
+    <!-- SIP 性能优化 -->
+    <param name="auto-restart" value="false"/>
+    <param name="threaded-system-exec" value="false"/>
+    
+    <!-- 媒体处理优化 -->
+    <param name="enable-softtimer" value="true"/>
+    <param name="enable-monotonic-timing" value="true"/>
+    
+    <!-- 内存调试 - 生产环境可关闭 -->
+    <param name="debug-level" value="1"/>
+    <param name="debug-presence" value="0"/>
+    
+  </settings>
+  
+  <!-- 默认域配置 -->
+  <default-ptimes>
+    <codec name="PCMU" ptime="20"/>
+    <codec name="PCMA" ptime="20"/>
+    <codec name="G722" ptime="20"/>
+    <codec name="GSM" ptime="20"/>
+    <codec name="G729" ptime="20"/>
+    <codec name="DVI4" ptime="20"/>
+    <codec name="LPC" ptime="20"/>
+  </default-ptimes>
+  
+</configuration>
