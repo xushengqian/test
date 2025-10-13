@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FreeSWITCH 全局变量优化配置 -->
+<include>
+  <!-- 性能优化相关变量 -->
+  
+  <!-- 编解码器优先级配置 - 优先选择低CPU占用的编解码器 -->
+  <X-PRE-PROCESS cmd="set" data="global_codec_prefs=PCMU,PCMA,G722"/>
+  <X-PRE-PROCESS cmd="set" data="outbound_codec_prefs=PCMU,PCMA,G722"/>
+  
+  <!-- RTP 超时配置 -->
+  <X-PRE-PROCESS cmd="set" data="rtp_timeout_sec=300"/>
+  <X-PRE-PROCESS cmd="set" data="rtp_hold_timeout_sec=1800"/>
+  
+  <!-- 会话超时优化 -->
+  <X-PRE-PROCESS cmd="set" data="session_timeout=1800"/>
+  <X-PRE-PROCESS cmd="set" data="pickup_timeout=60"/>
+  
+  <!-- SIP 优化配置 -->
+  <X-PRE-PROCESS cmd="set" data="sip_tls_version=tlsv1,tlsv1.1,tlsv1.2"/>
+  <X-PRE-PROCESS cmd="set" data="sip_tls_ciphers=ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"/>
+  
+  <!-- 音频质量优化 -->
+  <X-PRE-PROCESS cmd="set" data="sound_prefix=/usr/share/freeswitch/sounds/en/us/callie"/>
+  
+  <!-- 并发限制 -->
+  <X-PRE-PROCESS cmd="set" data="max_proceeding=1000"/>
+  <X-PRE-PROCESS cmd="set" data="session_in_progress=30000"/>
+  
+  <!-- 网络优化 -->
+  <X-PRE-PROCESS cmd="set" data="rtp_sdes_suites=AEAD_AES_256_GCM_8|AEAD_AES_128_GCM_8|AES_CM_256_HMAC_SHA1_80|AES_CM_192_HMAC_SHA1_80|AES_CM_128_HMAC_SHA1_80|AES_CM_256_HMAC_SHA1_32|AES_CM_192_HMAC_SHA1_32|AES_CM_128_HMAC_SHA1_32"/>
+  
+  <!-- DTMF 检测优化 -->
+  <X-PRE-PROCESS cmd="set" data="dtmf_duration=2000"/>
+  <X-PRE-PROCESS cmd="set" data="default_dtmf_duration=2000"/>
+  
+  <!-- 呼叫处理优化 -->
+  <X-PRE-PROCESS cmd="set" data="transfer_fallback_extension=operator"/>
+  <X-PRE-PROCESS cmd="set" data="use_profile=internal"/>
+  
+  <!-- 媒体处理 -->
+  <X-PRE-PROCESS cmd="set" data="bypass_media=false"/>
+  <X-PRE-PROCESS cmd="set" data="bypass_media_after_bridge=false"/>
+  <X-PRE-PROCESS cmd="set" data="proxy_media=false"/>
+  
+  <!-- 性能监控相关 -->
+  <X-PRE-PROCESS cmd="set" data="enable_heartbeat_events=false"/>
+  <X-PRE-PROCESS cmd="set" data="suppress_cng=true"/>
+  
+  <!-- 数据库优化 -->
+  <X-PRE-PROCESS cmd="set" data="db_auto_trans=false"/>
+  
+  <!-- 安全优化 -->
+  <X-PRE-PROCESS cmd="set" data="zrtp_secure_media=true"/>
+  <X-PRE-PROCESS cmd="set" data="endpoint_disposition=DELAYED NEGOTIATION"/>
+  
+  <!-- 内存优化 -->
+  <X-PRE-PROCESS cmd="set" data="rtp_autoflush_during_bridge=false"/>
+  
+</include>

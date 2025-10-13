@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SIP 配置文件性能优化 -->
+<profile name="internal">
+  <aliases>
+    <alias name="default"/>
+  </aliases>
+  <gateways>
+    <X-PRE-PROCESS cmd="include" data="internal/*.xml"/>
+  </gateways>
+  <domains>
+    <domain name="all" alias="false" parse="true"/>
+  </domains>
+  <settings>
+    
+    <!-- 基本网络设置 -->
+    <param name="bind-params" value="transport=udp"/>
+    <param name="sip-ip" value="$${local_ip_v4}"/>
+    <param name="sip-port" value="5060"/>
+    <param name="ext-sip-ip" value="auto-nat"/>
+    <param name="rtp-ip" value="$${local_ip_v4}"/>
+    
+    <!-- RTP 性能优化 -->
+    <param name="rtp-timer-name" value="soft"/>
+    <param name="rtp-rewrite-timestamps" value="true"/>
+    <param name="pass-rfc2833" value="true"/>
+    <param name="odbc-dsn" value="$${odbc_dsn}:$${database_username}:$${database_password}"/>
+    
+    <!-- 会话管理优化 -->
+    <param name="session-timeout" value="1800"/>
+    <param name="max-proceeding" value="1000"/>
+    <param name="multiple-registrations" value="false"/>
+    
+    <!-- 性能相关设置 -->
+    <param name="disable-transcoding" value="false"/>
+    <param name="all-reg-options-ping" value="false"/>
+    <param name="unregister-on-options-fail" value="false"/>
+    
+    <!-- 编解码器协商优化 -->
+    <param name="inbound-codec-prefs" value="$${global_codec_prefs}"/>
+    <param name="outbound-codec-prefs" value="$${outbound_codec_prefs}"/>
+    <param name="inbound-codec-negotiation" value="generous"/>
+    <param name="outbound-codec-negotiation" value="generous"/>
+    
+    <!-- 认证优化 -->
+    <param name="auth-calls" value="$${internal_auth_calls}"/>
+    <param name="auth-all-packets" value="false"/>
+    <param name="accept-blind-auth" value="true"/>
+    <param name="accept-blind-reg" value="false"/>
+    
+    <!-- DTMF 优化 -->
+    <param name="dtmf-duration" value="2000"/>
+    <param name="dtmf-type" value="rfc2833"/>
+    <param name="pass-rfc2833" value="true"/>
+    
+    <!-- 会话计时器 -->
+    <param name="enable-timer" value="false"/>
+    <param name="minimum-session-expires" value="120"/>
+    <param name="session-expires" value="1800"/>
+    
+    <!-- 媒体处理优化 -->
+    <param name="media-option" value="resume-media-on-hold"/>
+    <param name="inbound-bypass-media" value="false"/>
+    <param name="inbound-proxy-media" value="false"/>
+    
+    <!-- 网络优化 -->
+    <param name="rtp-timeout-sec" value="300"/>
+    <param name="rtp-hold-timeout-sec" value="1800"/>
+    <param name="force-register-domain" value="$${domain}"/>
+    <param name="force-subscription-domain" value="$${domain}"/>
+    <param name="force-register-db-domain" value="$${domain}"/>
+    
+    <!-- 日志和调试 -->
+    <param name="log-level" value="info"/>
+    <param name="tracelevel" value="DEBUG"/>
+    <param name="debug-presence" value="0"/>
+    
+    <!-- 安全设置 -->
+    <param name="apply-nat-acl" value="rfc1918.auto"/>
+    <param name="apply-inbound-acl" value="domains"/>
+    <param name="local-network-acl" value="localnet.auto"/>
+    
+    <!-- 注册优化 -->
+    <param name="send-message-query-on-register" value="false"/>
+    <param name="send-presence-on-register" value="true"/>
+    <param name="caller-id-type" value="rpid"/>
+    
+    <!-- 传输优化 -->
+    <param name="aggressive-nat-detection" value="true"/>
+    <param name="NDLB-to-in-200-contact" value="false"/>
+    <param name="NDLB-force-rport" value="true"/>
+    
+    <!-- 性能监控 -->
+    <param name="track-calls" value="true"/>
+    
+  </settings>
+</profile>

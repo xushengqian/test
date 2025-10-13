@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FreeSWITCH 模块配置优化 - 只加载必要的模块 -->
+<configuration name="modules.conf" description="Modules">
+  <modules>
+    
+    <!-- 核心模块 - 必需 -->
+    <load module="mod_console"/>
+    <load module="mod_logfile"/>
+    <load module="mod_syslog"/>
+    
+    <!-- 编解码器 - 根据需要选择，优先高效编解码器 -->
+    <load module="mod_g711"/>      <!-- PCMU/PCMA - 低CPU占用 -->
+    <load module="mod_g722"/>      <!-- G.722 - 宽带音频 -->
+    <!-- <load module="mod_g729"/> --> <!-- G.729 - 需要许可证，高CPU占用 -->
+    <!-- <load module="mod_amr"/> -->   <!-- AMR - 移动网络优化 -->
+    
+    <!-- 应用模块 -->
+    <load module="mod_dptools"/>   <!-- 拨号计划工具 -->
+    <load module="mod_expr"/>      <!-- 表达式计算 -->
+    <load module="mod_fifo"/>      <!-- 队列功能 -->
+    <load module="mod_hash"/>      <!-- 哈希表 -->
+    <load module="mod_voicemail"/> <!-- 语音邮件 -->
+    <load module="mod_conference"/> <!-- 会议功能 -->
+    
+    <!-- 端点模块 -->
+    <load module="mod_sofia"/>     <!-- SIP 协议栈 -->
+    <!-- <load module="mod_h323"/> -->   <!-- H.323 - 如果不需要可禁用 -->
+    
+    <!-- 方言模块 -->
+    <load module="mod_dialplan_xml"/> <!-- XML 拨号计划 -->
+    
+    <!-- 目录模块 -->
+    <load module="mod_ldap"/>      <!-- LDAP 目录 -->
+    
+    <!-- 事件套接字 -->
+    <load module="mod_event_socket"/> <!-- 事件接口 -->
+    
+    <!-- API 模块 -->
+    <load module="mod_commands"/>  <!-- 命令API -->
+    
+    <!-- 文件格式支持 -->
+    <load module="mod_native_file"/>
+    <load module="mod_sndfile"/>   <!-- 音频文件格式 -->
+    <load module="mod_tone_stream"/> <!-- 音调生成 -->
+    
+    <!-- 定时器模块 - 性能关键 -->
+    <load module="mod_timerfd"/>   <!-- Linux 高精度定时器 -->
+    <!-- <load module="mod_softtimer"/> --> <!-- 软件定时器备选 -->
+    
+    <!-- 数据库模块 -->
+    <!-- <load module="mod_db"/> -->      <!-- 内置数据库 - 如果使用外部数据库可禁用 -->
+    <load module="mod_pgsql"/>     <!-- PostgreSQL 支持 -->
+    <!-- <load module="mod_mariadb"/> --> <!-- MariaDB 支持 -->
+    
+    <!-- 脚本语言 - 根据需要加载 -->
+    <!-- <load module="mod_lua"/> -->     <!-- Lua 脚本 -->
+    <!-- <load module="mod_python"/> -->  <!-- Python 脚本 -->
+    
+    <!-- CDR 模块 -->
+    <load module="mod_cdr_csv"/>   <!-- CSV 格式 CDR -->
+    <!-- <load module="mod_cdr_sqlite"/> --> <!-- SQLite CDR -->
+    
+    <!-- 语音识别和TTS - 高CPU占用，按需加载 -->
+    <!-- <load module="mod_pocketsphinx"/> --> <!-- 语音识别 */
+    <!-- <load module="mod_flite"/> -->        <!-- TTS引擎 */
+    
+    <!-- XML 处理 -->
+    <load module="mod_xml_rpc"/>   <!-- XML-RPC 接口 -->
+    <load module="mod_xml_curl"/>  <!-- HTTP XML 获取 -->
+    
+    <!-- 媒体相关 -->
+    <!-- <load module="mod_shout"/> -->   <!-- MP3 流媒体 - 高CPU占用 -->
+    <!-- <load module="mod_local_stream"/> --> <!-- 本地流 */
+    
+    <!-- 高级功能 - 按需启用 -->
+    <!-- <load module="mod_callcenter"/> --> <!-- 呼叫中心 */
+    <!-- <load module="mod_distributor"/> --> <!-- 负载分发 */
+    <!-- <load module="mod_esl"/> -->        <!-- ESL 客户端 */
+    
+    <!-- 监控和统计 -->
+    <!-- <load module="mod_snmp"/> -->      <!-- SNMP 监控 */
+    
+  </modules>
+</configuration>
