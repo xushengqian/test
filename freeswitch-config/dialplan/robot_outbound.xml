@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<include>
+  <!-- 机器人呼出拨号计划 -->
+  <context name="robot_outbound">
+    
+    <!-- 机器人呼出主流程 -->
+    <extension name="robot_call_out">
+      <condition field="destination_number" expression="^robot_call_(\d+)$">
+        <!-- 设置通话变量 -->
+        <action application="set" data="customer_phone=$1"/>
+        <action application="set" data="call_direction=outbound"/>
+        <action application="set" data="robot_session_id=${uuid()}"/>
+        <action application="set" data="transfer_to_agent=false"/>
+        
+        <!-- 记录通话开始 -->
+        <action application="log" data="INFO 机器人呼出开始: ${customer_phone}"/>
+        
+        <!-- 执行机器人对话脚本 -->
+        <action application="javascript" data="/usr/local/freeswitch/scripts/robot_conversation.js"/>
+        
+        <!-- 检查是否需要转人工 -->
+        <action application="transfer" data="check_agent_transfer XML robot_outbound"/>
+      </condition>
+    </extension>
+    
+    <!-- 检查转人工逻辑 -->
+    <extension name="check_agent_transfer">
+      <condition field="destination_number" expression="^check_agent_transfer$"/>
+      <condition field="${transfer_to_agent}" expression="^true$">
+        <!-- 转接到人工客服 -->
+        <action application="log" data="INFO 检测到转人工意图，开始转接"/>
+        <action application="transfer" data="transfer_to_human_agent XML robot_outbound"/>
+        <anti-action application="log" data="INFO 机器人对话结束，无需转人工"/>
+        <anti-action application="hangup"/>
+      </condition>
+    </extension>
+    
+    <!-- 转接人工客服 -->
+    <extension name="transfer_to_human_agent">
+      <condition field="destination_number" expression="^transfer_to_human_agent$">
+        <!-- 播放转接提示音 -->
+        <action application="playback" data="/usr/local/freeswitch/sounds/transfer_to_agent.wav"/>
+        
+        <!-- 查找可用的人工客服 -->
+        <action application="javascript" data="/usr/local/freeswitch/scripts/find_available_agent.js"/>
+        
+        <!-- 转接到人工客服队列 -->
+        <action application="fifo" data="agent_queue out wait"/>
+        
+        <!-- 如果没有可用客服，播放留言提示 -->
+        <action application="playback" data="/usr/local/freeswitch/sounds/no_agent_available.wav"/>
+        <action application="javascript" data="/usr/local/freeswitch/scripts/voicemail_handler.js"/>
+      </condition>
+    </extension>
+    
+    <!-- 人工客服接听 -->
+    <extension name="agent_answer">
+      <condition field="destination_number" expression="^agent_(\d+)$">
+        <action application="set" data="agent_id=$1"/>
+        <action application="log" data="INFO 人工客服 ${agent_id} 接听"/>
+        
+        <!-- 加入客服队列 -->
+        <action application="fifo" data="agent_queue in"/>
+      </condition>
+    </extension>
+    
+  </context>
+</include>
