@@ -1,0 +1,128 @@
+2025-10-14 03:09:44,202 - __main__ - INFO - FreeSwitch 机器人呼出系统测试
+2025-10-14 03:09:44,202 - __main__ - INFO - 开始系统功能测试
+2025-10-14 03:09:44,202 - __main__ - INFO - 运行测试: 意图识别测试
+2025-10-14 03:09:44,202 - jieba - DEBUG - Building prefix dict from the default dictionary ...
+2025-10-14 03:09:44,496 - jieba - DEBUG - Dumping model to file cache /tmp/jieba.cache
+2025-10-14 03:09:44,527 - jieba - DEBUG - Loading model cost 0.325 seconds.
+2025-10-14 03:09:44,528 - jieba - DEBUG - Prefix dict has been built successfully.
+2025-10-14 03:09:44,528 - intent_service - INFO - jieba 分词器初始化完成
+2025-10-14 03:09:44,530 - intent_service - INFO - 意图识别结果: PRODUCT_INQUIRY (置信度: 0.70, 情感: neutral)
+2025-10-14 03:09:44,530 - __main__ - WARNING - ✗ 问候语识别: 期望 GREETING, 实际 PRODUCT_INQUIRY
+2025-10-14 03:09:44,530 - intent_service - INFO - 意图识别结果: TRANSFER_TO_AGENT (置信度: 1.00, 情感: neutral)
+2025-10-14 03:09:44,530 - __main__ - INFO - ✓ 转人工意图识别: TRANSFER_TO_AGENT (置信度: 1.00)
+2025-10-14 03:09:44,531 - intent_service - INFO - 意图识别结果: COMPLAINT (置信度: 0.75, 情感: neutral)
+2025-10-14 03:09:44,531 - __main__ - INFO - ✓ 投诉意图识别: COMPLAINT (置信度: 0.75)
+2025-10-14 03:09:44,531 - intent_service - INFO - 意图识别结果: TRANSFER_TO_AGENT (置信度: 0.95, 情感: neutral)
+2025-10-14 03:09:44,531 - __main__ - INFO - ✓ 复杂转人工表达: TRANSFER_TO_AGENT (置信度: 0.95)
+2025-10-14 03:09:44,531 - intent_service - INFO - 意图识别结果: GOODBYE (置信度: 1.00, 情感: happy)
+2025-10-14 03:09:44,531 - __main__ - INFO - ✓ 告别语识别: GOODBYE (置信度: 1.00)
+2025-10-14 03:09:44,531 - __main__ - INFO - 意图识别测试完成: 4/5 通过 (成功率: 80.0%)
+2025-10-14 03:09:44,531 - __main__ - INFO - 测试结果: 意图识别测试 - PASS
+2025-10-14 03:09:44,531 - __main__ - INFO - 运行测试: 呼出服务测试
+2025-10-14 03:09:44,540 - outbound_caller - INFO - 数据库初始化完成
+2025-10-14 03:09:44,542 - outbound_caller - INFO - 呼出任务已添加: TASK_1760411384_13800138000
+2025-10-14 03:09:44,542 - __main__ - INFO - ✓ 成功添加呼出任务: TASK_1760411384_13800138000
+2025-10-14 03:09:44,542 - __main__ - INFO - ✓ 成功获取统计信息: {"date": "2025-10-14", "tasks": {"total": 1, "completed": 0, "failed": 0, "pending": 1}, "calls": {"total": 0, "avg_duration": 0, "transfers": 0}}
+2025-10-14 03:09:44,542 - __main__ - INFO - ✓ 号码验证功能正常
+2025-10-14 03:09:44,542 - __main__ - INFO - 测试结果: 呼出服务测试 - PASS
+2025-10-14 03:09:44,542 - __main__ - INFO - 运行测试: 转接服务测试
+2025-10-14 03:09:44,548 - transfer_service - INFO - 客服数据库初始化完成
+2025-10-14 03:09:44,548 - transfer_service - INFO - 已加载 0 个客服
+2025-10-14 03:09:44,551 - transfer_service - INFO - 客服已添加: 客服小王 (agent_001)
+2025-10-14 03:09:44,553 - transfer_service - INFO - 客服已添加: 客服小李 (agent_002)
+2025-10-14 03:09:44,556 - transfer_service - INFO - 客服已添加: 客服小张 (agent_003)
+2025-10-14 03:09:44,558 - transfer_service - INFO - 客服已添加: 客服小陈 (agent_004)
+2025-10-14 03:09:44,559 - transfer_service - INFO - 客服已添加: 客服小刘 (agent_005)
+2025-10-14 03:09:44,562 - __main__ - INFO - ✓ 找到 5 个客服
+2025-10-14 03:09:44,563 - transfer_service - INFO - 客服状态已更新: agent_001 -> online
+2025-10-14 03:09:44,563 - __main__ - INFO - ✓ 成功设置客服 客服小王 为在线状态
+2025-10-14 03:09:44,563 - __main__ - INFO - ✓ 找到 1 个可用客服
+2025-10-14 03:09:44,563 - transfer_service - INFO - 收到转接请求: test_session_transfer (NORMAL)
+2025-10-14 03:09:44,564 - transfer_service - INFO - 模拟转接通话: test_session_transfer -> 1001
+2025-10-14 03:09:44,564 - transfer_service - INFO - 转接成功: test_session_transfer -> 客服小王
+2025-10-14 03:09:44,564 - __main__ - INFO - ✓ 转接请求成功: success
+2025-10-14 03:09:44,564 - __main__ - INFO - ✓ 成功获取转接统计信息
+2025-10-14 03:09:44,564 - __main__ - INFO - 测试结果: 转接服务测试 - PASS
+2025-10-14 03:09:44,564 - __main__ - INFO - 运行测试: 集成测试
+2025-10-14 03:09:44,564 - intent_service - INFO - jieba 分词器初始化完成
+2025-10-14 03:09:44,565 - transfer_service - INFO - 客服数据库初始化完成
+2025-10-14 03:09:44,565 - transfer_service - INFO - 已加载 5 个客服
+2025-10-14 03:09:44,566 - intent_service - INFO - 意图识别结果: TRANSFER_TO_AGENT (置信度: 1.00, 情感: neutral)
+2025-10-14 03:09:44,566 - __main__ - INFO - ✓ 系统正确识别转人工需求
+2025-10-14 03:09:44,567 - transfer_service - INFO - 客服状态已更新: agent_001 -> online
+2025-10-14 03:09:44,567 - __main__ - INFO - ✓ 设置客服 客服小王 在线
+2025-10-14 03:09:44,567 - transfer_service - INFO - 收到转接请求: integration_test_session (NORMAL)
+2025-10-14 03:09:44,568 - transfer_service - INFO - 模拟转接通话: integration_test_session -> 1001
+2025-10-14 03:09:44,568 - transfer_service - INFO - 转接成功: integration_test_session -> 客服小王
+2025-10-14 03:09:44,568 - __main__ - INFO - ✓ 转接流程完成: success
+2025-10-14 03:09:44,569 - intent_service - INFO - 意图识别结果: GREETING (置信度: 0.63, 情感: neutral)
+2025-10-14 03:09:44,569 - __main__ - INFO - 对话轮次 1: GREETING (转人工: False)
+2025-10-14 03:09:44,569 - intent_service - INFO - 意图识别结果: COMPLAINT (置信度: 0.24, 情感: neutral)
+2025-10-14 03:09:44,569 - __main__ - INFO - 对话轮次 2: COMPLAINT (转人工: False)
+2025-10-14 03:09:44,569 - intent_service - INFO - 意图识别结果: PRODUCT_INQUIRY (置信度: 0.70, 情感: neutral)
+2025-10-14 03:09:44,569 - __main__ - INFO - 对话轮次 3: PRODUCT_INQUIRY (转人工: False)
+2025-10-14 03:09:44,570 - intent_service - INFO - 意图识别结果: TRANSFER_TO_AGENT (置信度: 1.00, 情感: neutral)
+2025-10-14 03:09:44,570 - __main__ - INFO - 对话轮次 4: TRANSFER_TO_AGENT (转人工: True)
+2025-10-14 03:09:44,570 - intent_service - INFO - 意图识别结果: TRANSFER_TO_AGENT (置信度: 1.00, 情感: neutral)
+2025-10-14 03:09:44,570 - __main__ - INFO - ✓ 多轮对话转接判断正确
+2025-10-14 03:09:44,570 - __main__ - INFO - 测试结果: 集成测试 - PASS
+2025-10-14 03:09:44,570 - __main__ - INFO - ============================================================
+2025-10-14 03:09:44,570 - __main__ - INFO - 测试结果总结
+2025-10-14 03:09:44,570 - __main__ - INFO - ============================================================
+2025-10-14 03:09:44,570 - __main__ - INFO - ✓ 意图识别测试: PASS
+2025-10-14 03:09:44,570 - __main__ - INFO - ✓ 呼出服务测试: PASS
+2025-10-14 03:09:44,570 - __main__ - INFO - ✓ 转接服务测试: PASS
+2025-10-14 03:09:44,570 - __main__ - INFO - ✓ 集成测试: PASS
+2025-10-14 03:09:44,570 - __main__ - INFO - ------------------------------------------------------------
+2025-10-14 03:09:44,570 - __main__ - INFO - 总计: 4 个测试
+2025-10-14 03:09:44,570 - __main__ - INFO - 通过: 4 个
+2025-10-14 03:09:44,570 - __main__ - INFO - 失败: 0 个
+2025-10-14 03:09:44,570 - __main__ - INFO - 错误: 0 个
+2025-10-14 03:09:44,570 - __main__ - INFO - 成功率: 100.0%
+2025-10-14 03:09:44,570 - __main__ - INFO - ============================================================
+2025-10-14 03:10:48,396 - outbound_caller - INFO - 数据库初始化完成
+2025-10-14 03:10:48,400 - outbound_caller - INFO - 呼出任务已添加: TASK_1760411448_13800138001
+2025-10-14 03:10:48,403 - outbound_caller - INFO - 呼出任务已添加: TASK_1760411448_13900139001
+2025-10-14 03:10:48,405 - outbound_caller - INFO - 呼出任务已添加: TASK_1760411448_13700137001
+2025-10-14 03:10:48,405 - jieba - DEBUG - Building prefix dict from the default dictionary ...
+2025-10-14 03:10:48,405 - jieba - DEBUG - Loading model from cache /tmp/jieba.cache
+2025-10-14 03:10:48,746 - jieba - DEBUG - Loading model cost 0.340 seconds.
+2025-10-14 03:10:48,746 - jieba - DEBUG - Prefix dict has been built successfully.
+2025-10-14 03:10:48,746 - intent_service - INFO - jieba 分词器初始化完成
+2025-10-14 03:10:48,748 - intent_service - INFO - 意图识别结果: PRODUCT_INQUIRY (置信度: 0.70, 情感: neutral)
+2025-10-14 03:10:48,748 - intent_service - INFO - 意图识别结果: PRODUCT_INQUIRY (置信度: 0.42, 情感: neutral)
+2025-10-14 03:10:48,749 - intent_service - INFO - 意图识别结果: GOODBYE (置信度: 0.58, 情感: happy)
+2025-10-14 03:10:48,749 - intent_service - INFO - 意图识别结果: GOODBYE (置信度: 0.56, 情感: neutral)
+2025-10-14 03:10:48,749 - intent_service - INFO - 意图识别结果: GREETING (置信度: 0.63, 情感: neutral)
+2025-10-14 03:10:48,749 - intent_service - INFO - 意图识别结果: COMPLAINT (置信度: 0.75, 情感: neutral)
+2025-10-14 03:10:48,750 - intent_service - INFO - 意图识别结果: COMPLAINT (置信度: 0.70, 情感: angry)
+2025-10-14 03:10:48,750 - intent_service - INFO - 意图识别结果: AFFIRMATION (置信度: 0.18, 情感: neutral)
+2025-10-14 03:10:48,750 - intent_service - INFO - 意图识别结果: NEGATION (置信度: 0.11, 情感: neutral)
+2025-10-14 03:10:48,750 - intent_service - INFO - 意图识别结果: TECHNICAL_SUPPORT (置信度: 0.21, 情感: neutral)
+2025-10-14 03:10:48,751 - intent_service - INFO - 意图识别结果: TRANSFER_TO_AGENT (置信度: 1.00, 情感: neutral)
+2025-10-14 03:10:48,751 - transfer_service - INFO - 客服数据库初始化完成
+2025-10-14 03:10:48,751 - transfer_service - INFO - 已加载 5 个客服
+2025-10-14 03:10:48,753 - transfer_service - INFO - 客服状态已更新: agent_001 -> online
+2025-10-14 03:10:48,755 - transfer_service - INFO - 客服状态已更新: agent_002 -> online
+2025-10-14 03:10:48,757 - transfer_service - INFO - 客服状态已更新: agent_003 -> online
+2025-10-14 03:10:48,757 - transfer_service - INFO - 收到转接请求: session_vip_001 (VIP)
+2025-10-14 03:10:48,759 - transfer_service - INFO - 模拟转接通话: session_vip_001 -> 1003
+2025-10-14 03:10:48,759 - transfer_service - INFO - 转接成功: session_vip_001 -> 客服小张
+2025-10-14 03:10:48,759 - transfer_service - INFO - 收到转接请求: session_complaint_001 (HIGH)
+2025-10-14 03:10:48,760 - transfer_service - INFO - 模拟转接通话: session_complaint_001 -> 1002
+2025-10-14 03:10:48,760 - transfer_service - INFO - 转接成功: session_complaint_001 -> 客服小李
+2025-10-14 03:10:48,760 - transfer_service - INFO - 收到转接请求: session_normal_001 (NORMAL)
+2025-10-14 03:10:48,762 - transfer_service - INFO - 模拟转接通话: session_normal_001 -> 1001
+2025-10-14 03:10:48,762 - transfer_service - INFO - 转接成功: session_normal_001 -> 客服小王
+2025-10-14 03:10:48,762 - intent_service - INFO - jieba 分词器初始化完成
+2025-10-14 03:10:48,762 - transfer_service - INFO - 客服数据库初始化完成
+2025-10-14 03:10:48,762 - transfer_service - INFO - 已加载 5 个客服
+2025-10-14 03:10:48,765 - transfer_service - INFO - 客服状态已更新: agent_001 -> online
+2025-10-14 03:10:48,767 - transfer_service - INFO - 客服状态已更新: agent_002 -> online
+2025-10-14 03:10:48,767 - intent_service - INFO - 意图识别结果: PRODUCT_INQUIRY (置信度: 0.70, 情感: neutral)
+2025-10-14 03:10:48,767 - intent_service - INFO - 意图识别结果: PRODUCT_INQUIRY (置信度: 0.70, 情感: neutral)
+2025-10-14 03:10:48,767 - intent_service - INFO - 意图识别结果: PRODUCT_INQUIRY (置信度: 0.21, 情感: neutral)
+2025-10-14 03:10:48,768 - intent_service - INFO - 意图识别结果: TRANSFER_TO_AGENT (置信度: 1.00, 情感: neutral)
+2025-10-14 03:10:48,768 - transfer_service - INFO - 收到转接请求: complete_workflow_demo (NORMAL)
+2025-10-14 03:10:48,769 - transfer_service - INFO - 模拟转接通话: complete_workflow_demo -> 1002
+2025-10-14 03:10:48,769 - transfer_service - INFO - 转接成功: complete_workflow_demo -> 客服小李

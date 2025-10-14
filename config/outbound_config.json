@@ -1,0 +1,46 @@
+{
+  "freeswitch_host": "localhost",
+  "freeswitch_port": 8080,
+  "freeswitch_user": "freeswitch",
+  "freeswitch_password": "works",
+  "max_concurrent_calls": 5,
+  "call_retry_interval": 300,
+  "max_retry_attempts": 3,
+  "working_hours": {
+    "start": "09:00",
+    "end": "18:00",
+    "timezone": "Asia/Shanghai"
+  },
+  "blacklist_numbers": [
+    "12345678901",
+    "10086",
+    "10000"
+  ],
+  "rate_limit": {
+    "calls_per_minute": 10,
+    "calls_per_hour": 100,
+    "calls_per_day": 500
+  },
+  "dialplan": {
+    "context": "robot_outbound",
+    "caller_id_name": "智能客服",
+    "caller_id_number": "4008888888"
+  },
+  "robot": {
+    "max_conversation_turns": 10,
+    "transfer_threshold": 0.7,
+    "unknown_intent_limit": 3,
+    "negative_emotion_limit": 2
+  },
+  "database": {
+    "path": "logs/calls.db",
+    "backup_interval": 3600,
+    "cleanup_days": 30
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "logs/outbound_caller.log",
+    "max_size": "10MB",
+    "backup_count": 5
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "freeswitch": {
+    "host": "localhost",
+    "port": 8080,
+    "username": "freeswitch",
+    "password": "works",
+    "api_timeout": 30
+  },
+  "transfer": {
+    "max_wait_time": 300,
+    "retry_interval": 30,
+    "max_retries": 3,
+    "timeout_action": "voicemail",
+    "no_agent_action": "callback"
+  },
+  "queue": {
+    "vip_priority": true,
+    "max_queue_size": 50,
+    "position_announcement_interval": 60,
+    "estimated_wait_announcement": true
+  },
+  "agents": {
+    "default_max_calls": 3,
+    "skill_matching": true,
+    "load_balancing": true,
+    "priority_levels": {
+      "senior": 1,
+      "experienced": 3,
+      "junior": 5
+    }
+  },
+  "skills": {
+    "general": "通用客服技能",
+    "technical": "技术支持",
+    "complaint": "投诉处理",
+    "vip": "VIP客户服务",
+    "sales": "销售咨询",
+    "billing": "账单查询"
+  },
+  "notifications": {
+    "agent_offline_threshold": 1800,
+    "queue_length_threshold": 10,
+    "wait_time_threshold": 180,
+    "email_alerts": true,
+    "sms_alerts": false
+  },
+  "statistics": {
+    "update_interval": 60,
+    "retention_days": 90,
+    "metrics": [
+      "transfer_success_rate",
+      "average_wait_time",
+      "agent_utilization",
+      "queue_length"
+    ]
+  }
+}
