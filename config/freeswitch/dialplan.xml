@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FreeSWITCH 机器人外呼拨号计划 -->
+<include>
+  <!-- 机器人外呼上下文 -->
+  <context name="robot_outbound">
+    
+    <!-- 外呼处理 -->
+    <extension name="robot_call">
+      <condition field="destination_number" expression="^(\d+)$">
+        <!-- 设置通话变量 -->
+        <action application="set" data="call_timeout=30"/>
+        <action application="set" data="originate_timeout=30"/>
+        <action application="set" data="ignore_early_media=true"/>
+        <action application="set" data="bypass_media=false"/>
+        
+        <!-- 录音设置 -->
+        <action application="set" data="RECORD_STEREO=true"/>
+        <action application="set" data="media_bug_answer_req=true"/>
+        
+        <!-- 启动录音 -->
+        <action application="record_session" data="/var/lib/freeswitch/recordings/${strftime(%Y-%m-%d)}/${uuid}.wav"/>
+        
+        <!-- 应答呼叫 -->
+        <action application="answer"/>
+        
+        <!-- 播放欢迎语 -->
+        <action application="playback" data="ivr/ivr-welcome.wav"/>
+        
+        <!-- 连接到 Python ESL 应用 -->
+        <action application="socket" data="127.0.0.1:8040 async full"/>
+      </condition>
+    </extension>
+    
+    <!-- 转接人工坐席 -->
+    <extension name="transfer_to_agent">
+      <condition field="destination_number" expression="^agent_(\d+)$">
+        <!-- 播放转接提示音 -->
+        <action application="playback" data="ivr/ivr-hold_connect_call.wav"/>
+        
+        <!-- 播放等待音乐 -->
+        <action application="set" data="hold_music=${hold_music}"/>
+        
+        <!-- 桥接到坐席 -->
+        <action application="bridge" data="user/$1@${domain_name}"/>
+        
+        <!-- 转接失败处理 -->
+        <action application="playback" data="ivr/ivr-no_agents_available.wav"/>
+        <action application="hangup"/>
+      </condition>
+    </extension>
+    
+    <!-- 坐席队列 -->
+    <extension name="agent_queue">
+      <condition field="destination_number" expression="^queue_(\w+)$">
+        <!-- 加入队列 -->
+        <action application="set" data="fifo_music=$${hold_music}"/>
+        <action application="fifo" data="$1@$${domain} in"/>
+      </condition>
+    </extension>
+    
+  </context>
+  
+  <!-- 人工坐席上下文 -->
+  <context name="agents">
+    
+    <!-- 坐席登录 -->
+    <extension name="agent_login">
+      <condition field="destination_number" expression="^\*71(\d+)$">
+        <action application="set" data="result=${fifo_member(add $1@agents user/${user_name}@${domain_name} 1 20 5)}"/>
+        <action application="playback" data="ivr/ivr-you_are_now_logged_in.wav"/>
+      </condition>
+    </extension>
+    
+    <!-- 坐席登出 -->
+    <extension name="agent_logout">
+      <condition field="destination_number" expression="^\*72(\d+)$">
+        <action application="set" data="result=${fifo_member(del $1@agents user/${user_name}@${domain_name})}"/>
+        <action application="playback" data="ivr/ivr-you_are_now_logged_out.wav"/>
+      </condition>
+    </extension>
+    
+    <!-- 坐席接听 -->
+    <extension name="agent_answer">
+      <condition field="destination_number" expression="^100\d$">
+        <action application="answer"/>
+        <action application="fifo" data="agents@$${domain} out nowait"/>
+      </condition>
+    </extension>
+    
+  </context>
+</include>
