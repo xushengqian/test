@@ -1,0 +1,142 @@
+# FreeSWITCH 机器人呼出系统配置
+
+# FreeSWITCH 连接配置
+freeswitch:
+  host: "127.0.0.1"
+  port: 8021
+  password: "ClueCon"
+  
+  # SIP 配置
+  sip:
+    profile: "external"  # SIP profile 名称
+    gateway: "default"   # 网关名称
+    caller_id: "10086"   # 主叫号码
+    
+# 外呼配置
+outbound:
+  # 并发数限制
+  max_concurrent_calls: 10
+  
+  # 呼叫超时设置（秒）
+  ring_timeout: 30
+  call_timeout: 300  # 5分钟
+  
+  # 重试策略
+  retry:
+    enabled: true
+    max_attempts: 3
+    interval: 60  # 重试间隔（秒）
+    
+# 机器人配置
+robot:
+  # TTS 配置（文字转语音）
+  tts:
+    engine: "baidu"  # 可选: baidu, aliyun, xunfei
+    voice: "zh"      # 语音类型
+    speed: 5         # 语速
+    volume: 5        # 音量
+    
+  # 欢迎语
+  welcome_message: "您好，我是智能客服助手，请问有什么可以帮助您的吗？"
+  
+  # 转人工提示语
+  transfer_message: "好的，正在为您转接人工客服，请稍候..."
+  
+  # 结束语
+  goodbye_message: "感谢您的来电，再见！"
+
+# ASR 配置（语音识别）
+asr:
+  engine: "baidu"  # 可选: baidu, aliyun, xunfei, google
+  language: "zh-CN"
+  
+  # 百度语音识别配置
+  baidu:
+    app_id: "your_app_id"
+    api_key: "your_api_key"
+    secret_key: "your_secret_key"
+    
+  # 静音检测
+  silence_threshold: 3  # 静音时长（秒）
+  
+# 意图识别配置
+intent:
+  # 转人工关键词
+  transfer_keywords:
+    - "人工"
+    - "客服"
+    - "转接"
+    - "人工客服"
+    - "转人工"
+    - "找人"
+    - "专员"
+    - "人工服务"
+    - "不是机器人"
+    - "真人"
+    
+  # 意图判断阈值
+  confidence_threshold: 0.7
+  
+# 人工坐席配置
+agent:
+  # 坐席队列
+  queue: "support_queue"
+  
+  # 可用坐席列表
+  agents:
+    - number: "1001"
+      name: "坐席1"
+      skills: ["售后", "技术支持"]
+    - number: "1002"
+      name: "坐席2"
+      skills: ["销售", "咨询"]
+    - number: "1003"
+      name: "坐席3"
+      skills: ["投诉", "建议"]
+      
+  # 转接策略
+  transfer_strategy: "round_robin"  # 可选: round_robin, least_busy, skill_based
+  
+  # 等待音乐
+  hold_music: "/usr/share/freeswitch/sounds/music/8000/suite-espanola-op-47-leyenda.wav"
+  
+# 数据库配置
+database:
+  # MySQL 配置
+  mysql:
+    host: "127.0.0.1"
+    port: 3306
+    user: "root"
+    password: "password"
+    database: "freeswitch_bot"
+    
+  # Redis 配置（用于缓存和队列）
+  redis:
+    host: "127.0.0.1"
+    port: 6379
+    password: ""
+    db: 0
+    
+# 日志配置
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  file: "logs/outbound_bot.log"
+  rotation: "1 day"
+  retention: "30 days"
+  
+# Web 服务配置（用于接收回调）
+web:
+  host: "0.0.0.0"
+  port: 5000
+  debug: false
+  
+# 监控配置
+monitoring:
+  enabled: true
+  metrics_port: 9090
+  
+# 通话记录
+recording:
+  enabled: true
+  path: "/var/lib/freeswitch/recordings"
+  format: "wav"
