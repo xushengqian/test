@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+    
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 10
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+      pool-name: HikariCP-Test-Pool
+      auto-commit: true
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+# 测试环境的线程池配置（较小的配置）
+thread-pool:
+  database-query:
+    core-pool-size: 4
+    max-pool-size: 8
+    queue-capacity: 50
+    keep-alive-seconds: 30
+    thread-name-prefix: "test-db-query-"
+    rejection-policy: "CALLER_RUNS"
+
+monitoring:
+  enabled: true
+  metrics-interval: 10
+  slow-query-threshold: 500
+
+logging:
+  level:
+    com.example: INFO
+    org.springframework: WARN
+    com.zaxxer.hikari: WARN
