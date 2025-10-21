@@ -1,0 +1,85 @@
+spring:
+  datasource:
+    # 使用HikariCP连接池
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+    
+    # HikariCP 连接池配置
+    hikari:
+      # 最小空闲连接数
+      minimum-idle: 5
+      # 最大连接池大小 - 根据CPU核心数和数据库性能调整
+      maximum-pool-size: 20
+      # 连接超时时间(毫秒)
+      connection-timeout: 30000
+      # 连接空闲超时时间(毫秒)
+      idle-timeout: 600000
+      # 连接最大生命周期(毫秒)
+      max-lifetime: 1800000
+      # 连接测试查询
+      connection-test-query: SELECT 1
+      # 连接池名称
+      pool-name: HikariCP-Database-Pool
+      # 连接泄漏检测阈值(毫秒)
+      leak-detection-threshold: 60000
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        # 批量处理大小
+        jdbc:
+          batch_size: 50
+        # 二级缓存
+        cache:
+          use_second_level_cache: false
+
+# 自定义线程池配置
+thread-pool:
+  # 数据库查询线程池配置
+  database-query:
+    # 核心线程数 - 通常设置为CPU核心数
+    core-pool-size: 8
+    # 最大线程数 - 根据数据库连接池大小和系统负载调整
+    max-pool-size: 16
+    # 队列容量
+    queue-capacity: 100
+    # 线程空闲时间(秒)
+    keep-alive-seconds: 60
+    # 线程名前缀
+    thread-name-prefix: "db-query-"
+    # 拒绝策略: CALLER_RUNS, ABORT, DISCARD, DISCARD_OLDEST
+    rejection-policy: "CALLER_RUNS"
+    
+  # 异步任务线程池配置  
+  async-task:
+    core-pool-size: 4
+    max-pool-size: 8
+    queue-capacity: 50
+    keep-alive-seconds: 30
+    thread-name-prefix: "async-task-"
+    rejection-policy: "CALLER_RUNS"
+
+# 性能监控配置
+monitoring:
+  # 是否启用性能监控
+  enabled: true
+  # 监控指标收集间隔(秒)
+  metrics-interval: 30
+  # 慢查询阈值(毫秒)
+  slow-query-threshold: 1000
+
+logging:
+  level:
+    com.example: DEBUG
+    org.springframework: INFO
+    com.zaxxer.hikari: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
