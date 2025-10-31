@@ -1,0 +1,21 @@
+# Python 依赖包
+# 如果集成第三方 ASR/NLP 服务，可以添加相应的 SDK
+
+# 示例：如果使用百度语音识别
+# baidu-aip
+
+# 示例：如果使用讯飞语音识别
+# websocket-client
+
+# 示例：如果使用 Redis 存储座席状态
+# redis
+
+# 示例：如果使用数据库
+# pymysql
+# sqlalchemy
+
+# JSON 处理（Python 标准库已包含，无需安装）
+# json
+
+# 日志（Python 标准库已包含，无需安装）
+# logging

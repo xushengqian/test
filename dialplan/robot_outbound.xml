@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<include>
+  <!-- 机器人外呼 dialplan -->
+  <context name="robot-outbound">
+    <!-- 外呼入口 -->
+    <extension name="robot-outbound-call">
+      <condition field="destination_number" expression="^robot_outbound$">
+        <action application="set" data="call_timeout=30"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="set" data="continue_on_fail=true"/>
+        
+        <!-- 设置机器人参数 -->
+        <action application="set" data="robot_enabled=true"/>
+        <action application="set" data="transfer_to_agent=false"/>
+        
+        <!-- 执行 Lua 脚本处理呼叫 -->
+        <action application="lua" data="robot_outbound.lua handle_call"/>
+        
+        <!-- 如果设置了转人工标志，执行转接 -->
+        <action application="transfer" data="${transfer_destination} XML default"/>
+      </condition>
+    </extension>
+    
+    <!-- 转接人工路由 -->
+    <extension name="transfer-to-agent">
+      <condition field="destination_number" expression="^agent_(\d+)$">
+        <action application="set" data="effective_caller_id_number=${caller_id_number}"/>
+        <action application="set" data="effective_caller_id_name=转接客户"/>
+        <action application="bridge" data="user/${1}@${domain_name}"/>
+        <action application="hangup"/>
+      </condition>
+    </extension>
+  </context>
+</include>

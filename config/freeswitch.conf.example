@@ -1,0 +1,33 @@
+# FreeSWITCH 配置文件示例
+# 将此文件复制到 FreeSWITCH 配置目录并修改相应路径
+
+# 在 freeswitch.xml 或 autoload_configs/modules.conf.xml 中启用 Lua 模块
+# <load module="mod_lua"/>
+
+# 在 dialplan/default.xml 或创建单独的 dialplan 文件包含以下内容：
+# <include>
+#   <X-PRE-PROCESS cmd="include" data="dialplan/robot_outbound.xml"/>
+# </include>
+
+# Lua 脚本路径配置
+# 确保 robot_outbound.lua 在 Lua 脚本目录中
+# 或使用绝对路径：/workspace/scripts/robot_outbound.lua
+
+# Python 脚本路径配置
+# 确保 intent_detection.py 和 agent_manager.py 有执行权限
+# chmod +x /workspace/scripts/*.py
+
+# 座席配置
+# 座席列表在 agent_manager.py 中配置
+# 座席分机号需要与 FreeSWITCH 用户配置一致
+
+# 音频文件路径配置
+# 确保以下音频文件存在：
+# /usr/local/freeswitch/sounds/zh/cn/robot_welcome.wav
+# /usr/local/freeswitch/sounds/zh/cn/transferring.wav
+# /usr/local/freeswitch/sounds/zh/cn/no_agent_available.wav
+# /usr/local/freeswitch/sounds/zh/cn/robot_goodbye.wav
+
+# 录音文件路径
+# 录音文件临时存储在 /tmp/ 目录
+# 确保该目录有写权限
