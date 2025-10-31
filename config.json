@@ -1,0 +1,84 @@
+{
+  "freeswitch": {
+    "host": "127.0.0.1",
+    "esl_port": 8021,
+    "esl_password": "ClueCon",
+    "socket_port": 9090
+  },
+  
+  "outbound": {
+    "gateway": "my_gateway",
+    "caller_id": "10086",
+    "max_retry": 3,
+    "retry_interval": 60
+  },
+  
+  "robot": {
+    "max_conversation_rounds": 5,
+    "speech_timeout": 5,
+    "enable_recording": true,
+    "recording_path": "/var/log/freeswitch/recordings/"
+  },
+  
+  "intent_recognition": {
+    "transfer_keywords": [
+      "转人工",
+      "人工",
+      "客服",
+      "转接",
+      "人工客服",
+      "找人工",
+      "转",
+      "接人工",
+      "人工服务"
+    ],
+    "negative_keywords": [
+      "不用",
+      "不要",
+      "不需要",
+      "算了",
+      "没事"
+    ],
+    "confidence_threshold": 0.8
+  },
+  
+  "agents": {
+    "enabled": true,
+    "agent_list": ["1001", "1002", "1003"],
+    "queue_name": "support_queue",
+    "queue_timeout": 60,
+    "queue_music": "/usr/local/freeswitch/sounds/music_on_hold.wav",
+    "max_wait_time": 300
+  },
+  
+  "asr": {
+    "provider": "aliyun",
+    "app_key": "your_app_key",
+    "access_key": "your_access_key",
+    "language": "zh-CN",
+    "sample_rate": 8000
+  },
+  
+  "tts": {
+    "provider": "aliyun",
+    "app_key": "your_app_key",
+    "access_key": "your_access_key",
+    "voice": "xiaoyun",
+    "volume": 50,
+    "speech_rate": 0
+  },
+  
+  "audio_files": {
+    "welcome": "/usr/local/freeswitch/sounds/robot_welcome.wav",
+    "transfer_prompt": "/usr/local/freeswitch/sounds/transfer_prompt.wav",
+    "no_agent": "/usr/local/freeswitch/sounds/no_agent_available.wav",
+    "goodbye": "/usr/local/freeswitch/sounds/goodbye.wav"
+  },
+  
+  "logging": {
+    "level": "INFO",
+    "file": "/var/log/robot_call.log",
+    "max_size": 10485760,
+    "backup_count": 5
+  }
+}

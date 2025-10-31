@@ -1,0 +1,40 @@
+# FreeSWITCH 机器人外呼系统依赖包
+
+# FreeSWITCH ESL Python 库
+# 需要从 FreeSWITCH 源码安装或使用 pip install python-ESL
+python-ESL>=1.0.0
+
+# 基础库
+requests>=2.31.0
+urllib3>=2.0.0
+
+# 语音识别（根据实际使用的服务选择）
+# 阿里云
+aliyun-python-sdk-core>=2.13.36
+aliyun-python-sdk-nls>=1.0.0
+
+# 腾讯云
+tencentcloud-sdk-python>=3.0.900
+
+# 讯飞
+websocket-client>=1.6.0
+
+# 日志
+python-json-logger>=2.0.7
+
+# 数据库（可选）
+pymysql>=1.1.0
+redis>=4.6.0
+
+# 配置管理
+python-dotenv>=1.0.0
+
+# HTTP 服务器（用于回调接口）
+flask>=2.3.0
+gunicorn>=21.2.0
+
+# 任务调度
+APScheduler>=3.10.4
+
+# 数据处理
+pandas>=2.0.0

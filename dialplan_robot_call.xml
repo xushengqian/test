@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+FreeSWITCH 机器人外呼拨号计划配置
+文件位置: /usr/local/freeswitch/conf/dialplan/default/robot_call.xml
+-->
+
+<include>
+  <!-- 机器人外呼路由 -->
+  <extension name="robot_outbound_call">
+    <condition field="destination_number" expression="^(robot_call)$">
+      <action application="answer"/>
+      <action application="sleep" data="1000"/>
+      
+      <!-- 设置通话变量 -->
+      <action application="set" data="call_timeout=60"/>
+      <action application="set" data="continue_on_fail=true"/>
+      <action application="set" data="hangup_after_bridge=true"/>
+      
+      <!-- 启用录音 -->
+      <action application="set" data="RECORD_ARTIST=Robot Call"/>
+      <action application="record_session" data="/var/log/freeswitch/recordings/${uuid}.wav"/>
+      
+      <!-- 执行外部脚本（ESL） -->
+      <action application="socket" data="127.0.0.1:9090 async full"/>
+    </condition>
+  </extension>
+  
+  <!-- 机器人对话应用 -->
+  <extension name="robot_conversation">
+    <condition field="destination_number" expression="^9000$">
+      <action application="answer"/>
+      <action application="sleep" data="500"/>
+      
+      <!-- 播放欢迎语 -->
+      <action application="playback" data="/usr/local/freeswitch/sounds/robot_welcome.wav"/>
+      
+      <!-- 启动语音识别 -->
+      <action application="detect_speech" data="grammar robot_grammar"/>
+      
+      <!-- 进入机器人对话循环 -->
+      <action application="lua" data="robot_conversation.lua"/>
+    </condition>
+  </extension>
+  
+  <!-- 转接人工客服 -->
+  <extension name="transfer_to_agent">
+    <condition field="destination_number" expression="^transfer_agent$">
+      <action application="set" data="transfer_ringback=/usr/local/freeswitch/sounds/ringback.wav"/>
+      
+      <!-- 播放转接提示音 -->
+      <action application="playback" data="/usr/local/freeswitch/sounds/transfer_prompt.wav"/>
+      
+      <!-- 尝试转接到坐席队列 -->
+      <action application="fifo" data="support_queue in"/>
+      
+      <!-- 如果队列失败，尝试直接转接坐席 -->
+      <action application="bridge" data="user/1001,user/1002,user/1003"/>
+      
+      <!-- 如果都失败，播放留言提示 -->
+      <action application="playback" data="/usr/local/freeswitch/sounds/no_agent_available.wav"/>
+      <action application="voicemail" data="default ${domain_name} 9999"/>
+    </condition>
+  </extension>
+  
+  <!-- 坐席分机 -->
+  <extension name="agent_extension">
+    <condition field="destination_number" expression="^(100[1-3])$">
+      <action application="export" data="dialed_extension=$1"/>
+      <action application="bind_meta_app" data="1 b s execute_extension::dx XML features"/>
+      <action application="bind_meta_app" data="2 b s record_session::$${recordings_dir}/${caller_id_number}.${strftime(%Y-%m-%d-%H-%M-%S)}.wav"/>
+      <action application="set" data="ringback=${us-ring}"/>
+      <action application="set" data="transfer_ringback=$${hold_music}"/>
+      <action application="set" data="call_timeout=30"/>
+      <action application="set" data="hangup_after_bridge=true"/>
+      <action application="set" data="continue_on_fail=true"/>
+      
+      <!-- 振铃坐席 -->
+      <action application="bridge" data="user/${dialed_extension}@${domain_name}"/>
+      
+      <!-- 如果坐席未接听 -->
+      <action application="answer"/>
+      <action application="sleep" data="1000"/>
+      <action application="voicemail" data="default ${domain_name} ${dialed_extension}"/>
+    </condition>
+  </extension>
+  
+  <!-- FIFO 队列配置 -->
+  <extension name="support_queue_consumer">
+    <condition field="destination_number" expression="^(support_queue_in)$">
+      <action application="answer"/>
+      <action application="set" data="fifo_music=/usr/local/freeswitch/sounds/music_on_hold.wav"/>
+      <action application="fifo" data="support_queue in"/>
+    </condition>
+  </extension>
+  
+  <extension name="support_queue_agent">
+    <condition field="destination_number" expression="^(support_queue_out)$">
+      <action application="answer"/>
+      <action application="fifo" data="support_queue out nowait"/>
+    </condition>
+  </extension>
+</include>
