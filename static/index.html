@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freeswitch ?????</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .control-panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .transcription-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .transcription-box {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .transcription-header {
+            background: #f8f9fa;
+            padding: 15px;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .transcription-header.agent {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .transcription-header.customer {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+
+        .transcription-content {
+            padding: 20px;
+            min-height: 400px;
+            max-height: 600px;
+            overflow-y: auto;
+            background: #fafafa;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .transcription-item {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .transcription-item .time {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .transcription-item .text {
+            color: #333;
+        }
+
+        .status {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status.connected .status-indicator {
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+
+        .status.disconnected .status-indicator {
+            background: #dc3545;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state::before {
+            content: "??";
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Freeswitch ???????</h1>
+            <p>????????????????????????</p>
+        </div>
+
+        <div class="content">
+            <div id="status" class="status disconnected">
+                <span class="status-indicator"></span>
+                <span>???</span>
+            </div>
+
+            <div class="control-panel">
+                <h3 style="margin-bottom: 20px;">????</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>????????</label>
+                        <input type="text" id="caller" placeholder="??: 1001" value="1001">
+                    </div>
+                    <div class="form-group">
+                        <label>????????</label>
+                        <input type="text" id="callee" placeholder="??: 13800138000" value="13800138000">
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="makeCallBtn" onclick="makeCall()">????</button>
+            </div>
+
+            <div class="transcription-panel">
+                <div class="transcription-box">
+                    <div class="transcription-header agent">
+                        ?? ??????
+                    </div>
+                    <div class="transcription-content" id="agentTranscription">
+                        <div class="empty-state">???????...</div>
+                    </div>
+                </div>
+
+                <div class="transcription-box">
+                    <div class="transcription-header customer">
+                        ?? ??????
+                    </div>
+                    <div class="transcription-content" id="customerTranscription">
+                        <div class="empty-state">???????...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let currentCallUuid = null;
+        let agentItems = [];
+        let customerItems = [];
+
+        // ??WebSocket
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+            
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                console.log('WebSocket????');
+                updateStatus(true);
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket??:', error);
+                updateStatus(false);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket????');
+                updateStatus(false);
+                // 5????
+                setTimeout(connectWebSocket, 5000);
+            };
+
+            // ??
+            setInterval(() => {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ type: 'ping' }));
+                }
+            }, 30000);
+        }
+
+        function updateStatus(connected) {
+            const statusEl = document.getElementById('status');
+            if (connected) {
+                statusEl.className = 'status connected';
+                statusEl.innerHTML = '<span class="status-indicator"></span><span>???</span>';
+            } else {
+                statusEl.className = 'status disconnected';
+                statusEl.innerHTML = '<span class="status-indicator"></span><span>???</span>';
+            }
+        }
+
+        function handleWebSocketMessage(data) {
+            if (data.type === 'transcription') {
+                addTranscription(data.stream_type, data.text, data.timestamp);
+            } else if (data.type === 'subscribed') {
+                console.log('?????:', data.call_uuid);
+            }
+        }
+
+        function addTranscription(streamType, text, timestamp) {
+            const container = streamType === 'agent' 
+                ? document.getElementById('agentTranscription')
+                : document.getElementById('customerTranscription');
+            
+            // ?????
+            if (container.querySelector('.empty-state')) {
+                container.innerHTML = '';
+            }
+
+            const item = document.createElement('div');
+            item.className = 'transcription-item';
+            
+            const time = new Date(timestamp * 1000).toLocaleTimeString('zh-CN');
+            item.innerHTML = `
+                <div class="time">${time}</div>
+                <div class="text">${text}</div>
+            `;
+            
+            container.appendChild(item);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function makeCall() {
+            const caller = document.getElementById('caller').value;
+            const callee = document.getElementById('callee').value;
+
+            if (!caller || !callee) {
+                alert('??????????');
+                return;
+            }
+
+            const btn = document.getElementById('makeCallBtn');
+            btn.disabled = true;
+            btn.textContent = '???...';
+
+            try {
+                const response = await fetch('/api/call/make', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `caller=${encodeURIComponent(caller)}&callee=${encodeURIComponent(callee)}`
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentCallUuid = result.call_uuid;
+                    
+                    // ?????????
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({
+                            type: 'subscribe',
+                            call_uuid: currentCallUuid
+                        }));
+                    }
+                    
+                    alert('???????UUID: ' + currentCallUuid);
+                } else {
+                    alert('????: ' + (result.error || '????'));
+                }
+            } catch (error) {
+                console.error('????:', error);
+                alert('????: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '????';
+            }
+        }
+
+        // ???????WebSocket
+        window.onload = () => {
+            connectWebSocket();
+        };
+    </script>
+</body>
+</html>
