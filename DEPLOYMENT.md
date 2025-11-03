@@ -1,0 +1,232 @@
+# ????
+
+## ????
+
+1. **Freeswitch ???**
+   - ?????? Freeswitch
+   - ?? ESL (Event Socket Library)
+   - ??????????
+
+2. **Python ??**
+   - Python 3.8 ?????
+   - pip ????
+
+3. **ASR ????**
+   - ?????????? ASR ????
+   - ?? AppID?API Key ? Secret Key
+
+## ????
+
+### 1. ???????
+
+```bash
+cd /workspace
+```
+
+### 2. ??????????
+
+```bash
+python3 -m venv venv
+source venv/bin/activate  # Linux/Mac
+# ?
+venv\Scripts\activate  # Windows
+```
+
+### 3. ????
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. ??????
+
+?????????
+
+```bash
+cp .env.example .env
+```
+
+?? `.env` ???????????
+
+```bash
+# Freeswitch??
+FS_HOST=your_freeswitch_host
+FS_PORT=8021
+FS_PASSWORD=your_password
+
+# ASR????
+ASR_TYPE=baidu
+ASR_APP_ID=your_app_id
+ASR_API_KEY=your_api_key
+ASR_SECRET_KEY=your_secret_key
+
+# Web????
+API_HOST=0.0.0.0
+API_PORT=8000
+```
+
+### 5. ?? Freeswitch
+
+?? Freeswitch ? ESL ??????
+
+?? `freeswitch/conf/autoload_configs/event_socket.conf.xml`?
+
+```xml
+<configuration name="event_socket.conf" description="Socket Client">
+  <settings>
+    <param name="nat-map" value="false"/>
+    <param name="listen-ip" value="0.0.0.0"/>
+    <param name="listen-port" value="8021"/>
+    <param name="password" value="your_password"/>
+  </settings>
+</configuration>
+```
+
+?? Freeswitch?
+
+```bash
+fs_cli -x "reload mod_event_socket"
+```
+
+### 6. ????
+
+```bash
+python main.py
+```
+
+### 7. ????
+
+????????`http://your_server_ip:8000`
+
+## ??????
+
+### ?? systemd (Linux)
+
+?????? `/etc/systemd/system/freeswitch-transcription.service`?
+
+```ini
+[Unit]
+Description=Freeswitch Transcription Service
+After=network.target
+
+[Service]
+Type=simple
+User=your_user
+WorkingDirectory=/workspace
+Environment="PATH=/workspace/venv/bin"
+ExecStart=/workspace/venv/bin/python /workspace/main.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+????????
+
+```bash
+sudo systemctl enable freeswitch-transcription
+sudo systemctl start freeswitch-transcription
+```
+
+### ?? Supervisor
+
+?????? `/etc/supervisor/conf.d/freeswitch-transcription.conf`?
+
+```ini
+[program:freeswitch-transcription]
+command=/workspace/venv/bin/python /workspace/main.py
+directory=/workspace
+user=your_user
+autostart=true
+autorestart=true
+redirect_stderr=true
+stdout_logfile=/var/log/freeswitch-transcription.log
+```
+
+???
+
+```bash
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start freeswitch-transcription
+```
+
+### ?? Docker (??)
+
+?? `Dockerfile`?
+
+```dockerfile
+FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+CMD ["python", "main.py"]
+```
+
+??????
+
+```bash
+docker build -t freeswitch-transcription .
+docker run -d --name transcription \
+  -p 8000:8000 \
+  -e FS_HOST=your_freeswitch_host \
+  -e FS_PORT=8021 \
+  -e FS_PASSWORD=your_password \
+  -e ASR_TYPE=baidu \
+  -e ASR_APP_ID=your_app_id \
+  -e ASR_API_KEY=your_api_key \
+  -e ASR_SECRET_KEY=your_secret_key \
+  freeswitch-transcription
+```
+
+## ????
+
+### 1. ???? Freeswitch
+
+- ?? Freeswitch ????
+- ????????
+- ???????
+- ????????
+
+### 2. ASR ????
+
+- ?? API Key ? Secret Key ????
+- ??????
+- ?? ASR ????????
+
+### 3. WebSocket ????
+
+- ?????????
+- ???????
+- ????????????
+
+### 4. ???????
+
+- ?? Freeswitch ????
+- ?????????????????? `audio_handler.py`?
+
+## ?????
+
+???????`app.log`
+
+???????
+
+```bash
+tail -f app.log
+```
+
+???????
+
+```bash
+# systemd
+sudo systemctl status freeswitch-transcription
+
+# supervisor
+sudo supervisorctl status freeswitch-transcription
+```
