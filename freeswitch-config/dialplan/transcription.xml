@@ -1,0 +1,80 @@
+<!-- 
+  Freeswitch???? - ????????????
+  ????: /etc/freeswitch/dialplan/default/transcription.xml
+-->
+<include>
+  <extension name="outbound_with_transcription">
+    <condition field="destination_number" expression="^(transcribe_)(.*)$">
+      <action application="answer"/>
+      <action application="sleep" data="1000"/>
+      
+      <!-- ???? -->
+      <action application="set" data="continue_on_fail=true"/>
+      <action application="set" data="hangup_after_bridge=true"/>
+      
+      <!-- ??????ID -->
+      <action application="set" data="transcription_session_id=${uuid}"/>
+      
+      <!-- ?????? -->
+      <action application="set" data="caller_id_number=${caller_id_number}"/>
+      <action application="set" data="destination_number=$2"/>
+      
+      <!-- ?????? -->
+      <action application="set" data="RECORD_STEREO=true"/>
+      <action application="set" data="recording_follow_transfer=true"/>
+      
+      <!-- ????????WebSocket -->
+      <action application="lua" data="transcription_stream.lua ${transcription_session_id}"/>
+      
+      <!-- ????????????-->
+      <action application="playback" data="ivr/welcome.wav"/>
+      
+      <!-- ??????? -->
+      <action application="lua" data="bot_conversation.lua"/>
+      
+      <!-- ????????? -->
+      <action application="set" data="transfer_to_agent=${bot_transfer_flag}"/>
+      
+      <!-- ??????? -->
+      <action application="transfer" data="agent_queue XML default"/>
+    </condition>
+  </extension>
+  
+  <!-- ????? -->
+  <extension name="agent_queue">
+    <condition field="destination_number" expression="^agent_queue$">
+      <action application="answer"/>
+      
+      <!-- ?????? -->
+      <action application="set" data="hold_music=local_stream://moh"/>
+      
+      <!-- ??????? -->
+      <action application="lua" data="transcription_stream.lua ${transcription_session_id} agent_transfer"/>
+      
+      <!-- ????? -->
+      <!-- ????callcenter?????bridge??? -->
+      <action application="callcenter" data="support@default"/>
+      
+      <!-- ??????????? -->
+      <!-- <action application="bridge" data="user/agent1001@${domain_name}"/> -->
+      
+      <action application="hangup"/>
+    </condition>
+  </extension>
+  
+  <!-- ?????? -->
+  <extension name="agent_answer">
+    <condition field="destination_number" expression="^(agent)(\d{4})$">
+      <action application="answer"/>
+      
+      <!-- ??????ID -->
+      <action application="set" data="transcription_session_id=${uuid}"/>
+      
+      <!-- ????????? -->
+      <action application="lua" data="transcription_stream.lua ${transcription_session_id} bidirectional"/>
+      
+      <!-- ?????? -->
+      <action application="park"/>
+    </condition>
+  </extension>
+</include>
