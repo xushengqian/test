@@ -1,0 +1,48 @@
+<configuration name="mrcp.conf" description="MRCP Client Configuration">
+  <settings>
+    <!-- MRCP 服务器配置 -->
+    <param name="server" value="127.0.0.1:1544"/>
+    
+    <!-- 日志级别 -->
+    <param name="log-level" value="DEBUG"/>
+    
+    <!-- 连接超时 -->
+    <param name="connect-timeout" value="5000"/>
+    
+    <!-- 请求超时 -->
+    <param name="request-timeout" value="10000"/>
+    
+    <!-- 是否启用语音活动检测 (VAD) -->
+    <param name="enable-vad" value="true"/>
+    
+    <!-- 语音活动检测阈值 -->
+    <param name="vad-threshold" value="0.5"/>
+    
+    <!-- 是否启用实时流 -->
+    <param name="enable-realtime-stream" value="true"/>
+    
+    <!-- 音频格式 -->
+    <param name="audio-format" value="PCMU"/>
+    
+    <!-- 采样率 -->
+    <param name="sample-rate" value="8000"/>
+    
+    <!-- 通道数 -->
+    <param name="channels" value="1"/>
+  </settings>
+  
+  <!-- MRCP 配置文件 -->
+  <profiles>
+    <profile name="default">
+      <param name="server" value="127.0.0.1:1544"/>
+      <param name="client-port" value="1544"/>
+      <param name="server-port" value="1544"/>
+      <param name="rtp-ip" value="127.0.0.1"/>
+      <param name="rtp-port-min" value="4000"/>
+      <param name="rtp-port-max" value="5000"/>
+      <param name="codecs" value="PCMU PCMA"/>
+      <param name="enable-vad" value="true"/>
+      <param name="enable-realtime-stream" value="true"/>
+    </profile>
+  </profiles>
+</configuration>

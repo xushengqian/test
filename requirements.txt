@@ -1,0 +1,6 @@
+# Python ESL 客户端依赖
+# 注意：FreeSWITCH ESL 通常使用原生 socket，但可以添加其他依赖
+
+# 如果需要使用其他功能，可以添加：
+# websocket-client>=1.0.0
+# requests>=2.25.0

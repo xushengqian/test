@@ -1,0 +1,20 @@
+{
+  "name": "freeswitch-mrcp-realtime-stream",
+  "version": "1.0.0",
+  "description": "FreeSWITCH MRCP 实时语音流处理",
+  "main": "scripts/mrcp_stream_handler.js",
+  "scripts": {
+    "start": "node scripts/mrcp_stream_handler.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "freeswitch",
+    "mrcp",
+    "realtime",
+    "voice",
+    "stream"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}

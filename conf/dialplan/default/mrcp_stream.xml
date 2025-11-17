@@ -1,0 +1,59 @@
+<include>
+  <context name="default">
+    <!-- MRCP 实时语音流示例 -->
+    <extension name="mrcp_realtime_stream">
+      <condition field="destination_number" expression="^(9999)$">
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        
+        <!-- 设置 MRCP 参数 -->
+        <action application="set" data="mrcp_profile=default"/>
+        <action application="set" data="mrcp_enable_realtime_stream=true"/>
+        <action application="set" data="mrcp_audio_format=PCMU"/>
+        
+        <!-- 启动 MRCP 会话 -->
+        <action application="mrcp" data="start"/>
+        
+        <!-- 执行 Lua 脚本处理实时流 -->
+        <action application="lua" data="mrcp_realtime_stream.lua"/>
+        
+        <!-- 结束 MRCP 会话 -->
+        <action application="mrcp" data="stop"/>
+        
+        <action application="hangup"/>
+      </condition>
+    </extension>
+    
+    <!-- MRCP 实时语音流 - 带录音 -->
+    <extension name="mrcp_realtime_stream_with_record">
+      <condition field="destination_number" expression="^(9998)$">
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        
+        <!-- 设置 MRCP 参数 -->
+        <action application="set" data="mrcp_profile=default"/>
+        <action application="set" data="mrcp_enable_realtime_stream=true"/>
+        
+        <!-- 设置录音文件路径 -->
+        <action application="set" data="record_file=/tmp/mrcp_stream_${uuid}.wav"/>
+        
+        <!-- 启动录音 -->
+        <action application="record_session" data="/tmp/mrcp_stream_${uuid}.wav"/>
+        
+        <!-- 启动 MRCP 会话 -->
+        <action application="mrcp" data="start"/>
+        
+        <!-- 执行 Lua 脚本处理实时流 -->
+        <action application="lua" data="mrcp_realtime_stream.lua"/>
+        
+        <!-- 停止录音 -->
+        <action application="stop_record_session"/>
+        
+        <!-- 结束 MRCP 会话 -->
+        <action application="mrcp" data="stop"/>
+        
+        <action application="hangup"/>
+      </condition>
+    </extension>
+  </context>
+</include>
