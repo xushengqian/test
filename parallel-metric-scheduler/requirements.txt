@@ -1,0 +1,17 @@
+# 数据库相关
+SQLAlchemy==2.0.23
+PyMySQL==1.1.0
+cryptography==41.0.7
+
+# Redis
+redis==5.0.1
+
+# 日志
+loguru==0.7.2
+
+# 调度
+APScheduler==3.10.4
+croniter==2.0.1
+
+# 工具库
+python-dotenv==1.0.0
