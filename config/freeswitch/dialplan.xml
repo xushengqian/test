@@ -1,0 +1,81 @@
+<!-- FreeSWITCH Dialplan for MRCP Integration -->
+<include>
+  <!-- ASR语音识别示例 -->
+  <extension name="mrcp_asr_demo">
+    <condition field="destination_number" expression="^5001$">
+      <action application="answer"/>
+      <action application="sleep" data="1000"/>
+      <action application="play_and_detect_speech" 
+              data="ivr/ivr-please_hold.wav detect:unimrcp:speech-server {start-input-timers=false,no-input-timeout=5000,recognition-timeout=10000}builtin:grammar/boolean?language=zh-CN"/>
+      <action application="log" data="INFO ASR Result: ${detect_speech_result}"/>
+      <action application="speak" data="unimrcp:speech-server|你说的是${detect_speech_result}"/>
+      <action application="hangup"/>
+    </condition>
+  </extension>
+
+  <!-- TTS文本转语音示例 -->
+  <extension name="mrcp_tts_demo">
+    <condition field="destination_number" expression="^5002$">
+      <action application="answer"/>
+      <action application="sleep" data="1000"/>
+      <action application="speak" data="unimrcp:speech-server|你好，欢迎使用FreeSWITCH和MRCP实时语音流系统"/>
+      <action application="hangup"/>
+    </condition>
+  </extension>
+
+  <!-- 实时语音流捕获 -->
+  <extension name="mrcp_stream_capture">
+    <condition field="destination_number" expression="^5003$">
+      <action application="answer"/>
+      <action application="set" data="RECORD_ARTIST=FreeSWITCH"/>
+      <action application="set" data="RECORD_TITLE=MRCP Audio Stream"/>
+      
+      <!-- 启动实时流处理 -->
+      <action application="socket" data="127.0.0.1:8021 async full"/>
+      
+      <!-- 开始识别 -->
+      <action application="detect_speech" 
+              data="unimrcp:speech-server {start-input-timers=true,no-input-timeout=5000}builtin:grammar/boolean?language=zh-CN"/>
+      
+      <!-- 保持通话以便持续捕获 -->
+      <action application="park"/>
+    </condition>
+  </extension>
+
+  <!-- 双向语音流（ASR + TTS） -->
+  <extension name="mrcp_interactive">
+    <condition field="destination_number" expression="^5004$">
+      <action application="answer"/>
+      <action application="sleep" data="1000"/>
+      <action application="speak" data="unimrcp:speech-server|请说出您的问题"/>
+      
+      <!-- 循环处理语音输入 -->
+      <action application="play_and_detect_speech" 
+              data="silence_stream://2000 detect:unimrcp:speech-server {start-input-timers=true,no-input-timeout=5000,recognition-timeout=10000}builtin:grammar/boolean?language=zh-CN"/>
+      
+      <action application="log" data="INFO User said: ${detect_speech_result}"/>
+      
+      <!-- 根据识别结果回复 -->
+      <action application="speak" data="unimrcp:speech-server|我听到你说${detect_speech_result}"/>
+      
+      <action application="hangup"/>
+    </condition>
+  </extension>
+
+  <!-- WebSocket实时流传输 -->
+  <extension name="mrcp_websocket_stream">
+    <condition field="destination_number" expression="^5005$">
+      <action application="answer"/>
+      <action application="set" data="websocket_url=ws://127.0.0.1:8765/audio"/>
+      
+      <!-- 通过WebSocket发送音频流 -->
+      <action application="socket" data="127.0.0.1:8021 async full"/>
+      
+      <!-- 同时启用MRCP识别 -->
+      <action application="detect_speech" 
+              data="unimrcp:speech-server {start-input-timers=true}builtin:grammar/boolean?language=zh-CN"/>
+      
+      <action application="park"/>
+    </condition>
+  </extension>
+</include>

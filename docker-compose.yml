@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # FreeSWITCH服务
+  freeswitch:
+    build: .
+    container_name: freeswitch-mrcp
+    hostname: freeswitch
+    ports:
+      - "5060:5060/udp"    # SIP
+      - "4000-5000:4000-5000/udp"  # RTP
+      - "8021:8021"        # ESL
+    volumes:
+      - ./config/freeswitch:/etc/freeswitch
+      - freeswitch-logs:/var/log/freeswitch
+      - freeswitch-data:/var/lib/freeswitch
+    networks:
+      - mrcp-network
+    restart: unless-stopped
+    environment:
+      - FREESWITCH_LOG_LEVEL=INFO
+    command: ["freeswitch", "-nonat", "-c"]
+
+  # MRCP服务器（如果需要）
+  mrcp-server:
+    image: unimrcp/unimrcp-server:latest
+    container_name: mrcp-server
+    hostname: mrcp-server
+    ports:
+      - "1544:1544"        # MRCP
+    networks:
+      - mrcp-network
+    restart: unless-stopped
+    # 如果有自定义MRCP配置，可以挂载
+    # volumes:
+    #   - ./config/unimrcp:/usr/local/unimrcp/conf
+
+  # WebSocket音频流服务器
+  websocket-server:
+    build: .
+    container_name: websocket-audio-server
+    hostname: websocket-server
+    ports:
+      - "8765:8765"        # WebSocket
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+      - mrcp-logs:/var/log/mrcp_stream
+    networks:
+      - mrcp-network
+    restart: unless-stopped
+    command: ["websocket-server"]
+    depends_on:
+      - freeswitch
+
+  # 音频流处理器
+  stream-processor:
+    build: .
+    container_name: audio-stream-processor
+    hostname: stream-processor
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+      - mrcp-logs:/var/log/mrcp_stream
+    networks:
+      - mrcp-network
+    restart: unless-stopped
+    command: ["stream-processor"]
+    depends_on:
+      - freeswitch
+      - mrcp-server
+
+networks:
+  mrcp-network:
+    driver: bridge
+
+volumes:
+  freeswitch-logs:
+  freeswitch-data:
+  mrcp-logs:

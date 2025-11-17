@@ -1,0 +1,48 @@
+# FreeSWITCH + MRCP 实时语音流处理系统
+# Python依赖包
+
+# 核心依赖
+asyncio>=3.4.3
+websockets>=10.0
+aiofiles>=0.8.0
+
+# 音频处理
+pydub>=0.25.1
+wave>=0.0.2
+audioop-lts>=0.2.0
+
+# 网络和通信
+python-socketio>=5.7.0
+requests>=2.28.0
+
+# 配置和日志
+configparser>=5.2.0
+python-dotenv>=0.20.0
+
+# FreeSWITCH ESL客户端
+python-freeswitch>=1.0.0
+ESL>=0.0.1
+
+# MRCP相关
+# 注意: 可能需要安装 unimrcp 或其他MRCP客户端库
+
+# 数据处理
+numpy>=1.21.0
+scipy>=1.7.0
+
+# 工具
+tqdm>=4.62.0
+colorama>=0.4.4
+
+# 开发和测试
+pytest>=7.0.0
+pytest-asyncio>=0.18.0
+black>=22.0.0
+flake8>=4.0.0
+mypy>=0.950
+
+# 可选依赖（用于高级功能）
+# pyaudio>=0.2.11  # 麦克风输入
+# sounddevice>=0.4.4  # 音频设备管理
+# librosa>=0.9.0  # 高级音频分析
+# webrtcvad>=2.0.10  # WebRTC VAD

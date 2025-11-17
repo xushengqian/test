@@ -1,0 +1,53 @@
+<!-- MRCP Profile Configuration for FreeSWITCH -->
+<configuration name="unimrcp.conf" description="UniMRCP Client">
+  <settings>
+    <!-- 默认TTS和ASR配置文件 -->
+    <param name="default-tts-profile" value="speech-server"/>
+    <param name="default-asr-profile" value="speech-server"/>
+    <param name="log-level" value="DEBUG"/>
+    <param name="max-connection-count" value="100"/>
+    <param name="offer-new-connection" value="1"/>
+  </settings>
+
+  <!-- MRCP服务器配置文件 -->
+  <profiles>
+    <X-PRE-PROCESS cmd="include" data="../mrcp_profiles/*.xml"/>
+    
+    <!-- 语音识别和合成服务器配置 -->
+    <profile name="speech-server" version="2">
+      <param name="client-ip" value="auto"/>
+      <param name="client-port" value="5060"/>
+      
+      <!-- MRCP服务器地址 -->
+      <param name="server-ip" value="127.0.0.1"/>
+      <param name="server-port" value="1544"/>
+      
+      <!-- SIP配置 -->
+      <param name="sip-transport" value="udp"/>
+      
+      <!-- RTP配置 -->
+      <param name="rtp-ip" value="auto"/>
+      <param name="rtp-port-min" value="4000"/>
+      <param name="rtp-port-max" value="5000"/>
+      
+      <!-- 编解码器配置 -->
+      <param name="codecs" value="PCMU PCMA L16/96/8000"/>
+      
+      <!-- 语音识别资源 -->
+      <synthparams>
+      </synthparams>
+      
+      <recogparams>
+        <param name="start-input-timers" value="false"/>
+        <param name="no-input-timeout" value="5000"/>
+        <param name="recognition-timeout" value="10000"/>
+        <param name="speech-complete-timeout" value="1000"/>
+        <param name="speech-incomplete-timeout" value="2000"/>
+      </recogparams>
+      
+      <!-- 最大连接数 -->
+      <param name="max-connection-count" value="100"/>
+      <param name="offer-new-connection" value="1"/>
+    </profile>
+  </profiles>
+</configuration>
