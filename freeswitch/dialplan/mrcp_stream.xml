@@ -1,0 +1,38 @@
+<!-- FreeSWITCH Dialplan 配置 - MRCP 实时语音流 -->
+<include>
+  <context name="mrcp_stream">
+    <!-- 实时语音流处理 -->
+    <extension name="mrcp_realtime_stream">
+      <condition field="destination_number" expression="^mrcp_stream$">
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        
+        <!-- 设置 RTP 参数 -->
+        <action application="set" data="rtp_secure_media=false"/>
+        <action application="set" data="rtp_ip=auto"/>
+        
+        <!-- 启动 MRCP 实时语音流 -->
+        <action application="lua" data="mrcp_realtime_stream.lua"/>
+      </condition>
+    </extension>
+    
+    <!-- MRCP ASR 实时识别 -->
+    <extension name="mrcp_asr_realtime">
+      <condition field="destination_number" expression="^mrcp_asr$">
+        <action application="answer"/>
+        <action application="mrcp" data="asr:uniMRCP-server"/>
+        <action application="playback" data="silence_stream://1000"/>
+        <action application="speech_recognition" data="uniMRCP-server default"/>
+      </condition>
+    </extension>
+    
+    <!-- MRCP TTS 实时合成 -->
+    <extension name="mrcp_tts_realtime">
+      <condition field="destination_number" expression="^mrcp_tts$">
+        <action application="answer"/>
+        <action application="mrcp" data="tts:uniMRCP-server"/>
+        <action application="speak" data="uniMRCP-server|你好，这是实时语音合成测试"/>
+      </condition>
+    </extension>
+  </context>
+</include>

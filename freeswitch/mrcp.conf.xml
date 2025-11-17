@@ -1,0 +1,47 @@
+<!-- FreeSWITCH MRCP 配置文件 -->
+<configuration name="mrcp.conf" description="MRCP Client Configuration">
+  <settings>
+    <!-- MRCP 服务器配置 -->
+    <param name="server-ip" value="127.0.0.1"/>
+    <param name="server-port" value="1544"/>
+    
+    <!-- 语音识别 (ASR) 配置 -->
+    <param name="asr-server-ip" value="127.0.0.1"/>
+    <param name="asr-server-port" value="1544"/>
+    <param name="asr-profile" value="uniMRCP-server"/>
+    
+    <!-- 语音合成 (TTS) 配置 -->
+    <param name="tts-server-ip" value="127.0.0.1"/>
+    <param name="tts-server-port" value="1544"/>
+    <param name="tts-profile" value="uniMRCP-server"/>
+    
+    <!-- RTP 配置 -->
+    <param name="rtp-ip" value="auto"/>
+    <param name="rtp-port-min" value="16384"/>
+    <param name="rtp-port-max" value="32768"/>
+    
+    <!-- 日志级别 -->
+    <param name="log-level" value="DEBUG"/>
+    
+    <!-- 超时设置 -->
+    <param name="request-timeout" value="5000"/>
+    <param name="speech-timeout" value="10000"/>
+    
+    <!-- 编码格式 -->
+    <param name="codec" value="PCMU"/>
+    <param name="sample-rate" value="8000"/>
+  </settings>
+  
+  <!-- MRCP 配置文件 -->
+  <profiles>
+    <profile name="uniMRCP-server">
+      <param name="client-ip" value="127.0.0.1"/>
+      <param name="client-port" value="5069"/>
+      <param name="server-ip" value="127.0.0.1"/>
+      <param name="server-port" value="1544"/>
+      <param name="uri" value="mrcp://127.0.0.1:1544"/>
+      <param name="codec" value="PCMU"/>
+      <param name="speech-channel-timeout" value="30"/>
+    </profile>
+  </profiles>
+</configuration>

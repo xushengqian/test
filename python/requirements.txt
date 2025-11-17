@@ -1,0 +1,11 @@
+# FreeSWITCH MRCP 实时语音流项目依赖
+
+# 如果需要使用 ESL (Event Socket Library) 连接 FreeSWITCH
+# python-esl  # 需要从源码编译安装
+
+# 基础依赖
+# 本项目主要使用标准库，无需额外依赖
+
+# 可选：如果需要更好的日志和配置管理
+# pyyaml>=6.0
+# colorlog>=6.7.0
