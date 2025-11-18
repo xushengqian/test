@@ -33,8 +33,17 @@ chmod +x kill_freeswitch_channel.py
 # 终止指定通道
 ./kill_freeswitch_channel.py --kill <UUID>
 
+# 强制终止指定通道（使用 KILL 参数）
+./kill_freeswitch_channel.py --kill <UUID> --force
+
+# 强制清除指定通道（跳过检查，尝试多种方法）
+./kill_freeswitch_channel.py --kill <UUID> --force-clear
+
 # 终止所有通道
 ./kill_freeswitch_channel.py --kill-all
+
+# 强制清除所有通道
+./kill_freeswitch_channel.py --kill-all --force-clear
 
 # 检查通道是否存在
 ./kill_freeswitch_channel.py --check <UUID>
@@ -52,8 +61,17 @@ chmod +x kill_freeswitch_channel.sh
 # 终止指定通道
 ./kill_freeswitch_channel.sh --kill <UUID>
 
+# 强制终止指定通道（使用 KILL 参数）
+./kill_freeswitch_channel.sh --kill <UUID> --force
+
+# 强制清除指定通道（跳过检查，尝试多种方法）
+./kill_freeswitch_channel.sh --kill <UUID> --force-clear
+
 # 终止所有通道
 ./kill_freeswitch_channel.sh --kill-all
+
+# 强制清除所有通道
+./kill_freeswitch_channel.sh --kill-all --force-clear
 
 # 检查通道是否存在
 ./kill_freeswitch_channel.sh --check <UUID>
@@ -78,7 +96,29 @@ A: 这通常发生在以下情况：
 
 **Q: 如何强制终止通道？**
 
-A: 使用 `--force` 参数（Python 版本）或 `--force` 选项（Shell 版本）
+A: 有两种方式：
+- `--force` 或 `-f`: 使用 `uuid_kill <UUID> KILL` 强制终止
+- `--force-clear`: 跳过检查，尝试多种清除方法（最强力）
+
+**Q: 如何强制清除会话？**
+
+A: 使用 `--force-clear` 选项，这会：
+1. 跳过通道存在性检查
+2. 依次尝试多种清除方法：
+   - `uuid_kill <UUID> KILL` - 强制终止
+   - `uuid_break <UUID> all` - 断开所有
+   - `uuid_transfer` - 转移并挂起
+   - `hupall` - 挂断
+   - 直接 API 调用
+
+示例：
+```bash
+# 强制清除指定通道
+./kill_freeswitch_channel.py --kill <UUID> --force-clear
+
+# 强制清除所有通道
+./kill_freeswitch_channel.py --kill-all --force-clear
+```
 
 ## 注意事项
 
