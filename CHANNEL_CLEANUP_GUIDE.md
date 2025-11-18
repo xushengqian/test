@@ -62,6 +62,32 @@ tail -f /usr/local/freeswitch/log/freeswitch.log | grep -E "CHANNEL_HANGUP|CHANN
 grep "<uuid>" /usr/local/freeswitch/log/freeswitch.log
 ```
 
+## 常见错误处理
+
+### uuid_kill 返回 "No such channel!"
+
+如果遇到 `uuid_kill` 返回 "No such channel!" 错误，可能的原因：
+
+1. **显示延迟**: `show channels` 显示的是缓存的通道信息，通道实际已经不存在
+2. **通道状态异常**: 通道处于异常状态，无法通过常规方法清理
+3. **UUID 格式错误**: UUID 格式不正确或已过期
+
+**解决方法**:
+
+```bash
+# 使用增强版清理脚本（已更新 cleanup_channels.sh）
+./cleanup_channels.sh
+
+# 或使用强制清理脚本
+./force_cleanup_channels.sh
+```
+
+强制清理脚本会：
+- 先检查通道是否真的存在（使用 `uuid_exists`）
+- 尝试多种清理方法（`uuid_kill`、`uuid_destroy`）
+- 处理 "No such channel" 错误
+- 区分"不存在"和"清理失败"的情况
+
 ## 解决方案
 
 ### 方案 1: 使用清理脚本（临时解决）

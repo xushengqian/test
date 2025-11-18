@@ -24,6 +24,9 @@ DRY_RUN=true ./cleanup_channels.sh
 
 # 确认后执行实际清理
 ./cleanup_channels.sh
+
+# 如果遇到 "No such channel" 错误，使用强制清理脚本
+./force_cleanup_channels.sh
 ```
 
 ### 3. 自动清理（Lua 脚本）
@@ -37,7 +40,8 @@ fs_cli -x "luarun auto_cleanup_channels.lua cleanup"
 ## 文件说明
 
 - `diagnose_channels.sh` - 通道诊断脚本，检查残留通道并分析原因
-- `cleanup_channels.sh` - 通道清理脚本，强制挂断残留通道
+- `cleanup_channels.sh` - 通道清理脚本，强制挂断残留通道（已更新错误处理）
+- `force_cleanup_channels.sh` - 强制清理脚本，处理 "No such channel" 错误
 - `auto_cleanup_channels.lua` - Lua 自动清理脚本，可集成到 FreeSWITCH
 - `CHANNEL_CLEANUP_GUIDE.md` - 详细的问题分析和解决方案文档
 
