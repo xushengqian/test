@@ -1,0 +1,352 @@
+<!--
+FreeSWITCH 超时配置示例
+用途：防止通道残留的配置参数
+
+使用说明：
+1. 将相关配置添加到对应的 FreeSWITCH 配置文件中
+2. 根据实际业务需求调整超时参数
+3. 重启 FreeSWITCH 或重新加载配置使其生效
+-->
+
+<!-- ============================================ -->
+<!-- 1. vars.xml 全局变量配置 -->
+<!-- 路径: conf/vars.xml -->
+<!-- ============================================ -->
+
+<X-PRE-PROCESS cmd="set" data="default_provider=example.com"/>
+<X-PRE-PROCESS cmd="set" data="default_provider_username=username"/>
+<X-PRE-PROCESS cmd="set" data="default_provider_password=password"/>
+
+<!-- RTP 超时设置（秒） -->
+<!-- 当 RTP 媒体流在指定时间内无活动时，自动挂断通道 -->
+<X-PRE-PROCESS cmd="set" data="rtp_timeout_sec=300"/>
+
+<!-- RTP 保持超时（秒） -->
+<!-- 当通话处于保持状态时，RTP 超时时间 -->
+<X-PRE-PROCESS cmd="set" data="rtp_hold_timeout_sec=1800"/>
+
+<!-- 外呼超时（秒） -->
+<!-- 外呼时等待应答的最大时间 -->
+<X-PRE-PROCESS cmd="set" data="call_timeout=30"/>
+
+<!-- 最大通话时长（秒） -->
+<!-- 设置单次通话的最大允许时长 -->
+<X-PRE-PROCESS cmd="set" data="max_call_duration=3600"/>
+
+
+<!-- ============================================ -->
+<!-- 2. SIP Profile 配置 -->
+<!-- 路径: conf/sip_profiles/internal.xml 或 external.xml -->
+<!-- ============================================ -->
+
+<profile name="internal">
+  <settings>
+    <!-- 其他参数... -->
+    
+    <!-- 启用 Session Timer (RFC 4028) -->
+    <!-- 用于检测和清理僵死的 SIP 会话 -->
+    <param name="enable-timer" value="true"/>
+    
+    <!-- Session 超时时间（秒） -->
+    <param name="session-timeout" value="1800"/>
+    
+    <!-- 最小 Session 过期时间（秒） -->
+    <param name="minimum-session-expires" value="90"/>
+    
+    <!-- Dialog 超时时间（秒） -->
+    <!-- 控制 SIP dialog 的最大存活时间 -->
+    <param name="dialog-timeout" value="43200"/>
+    
+    <!-- INVITE 超时（毫秒） -->
+    <param name="invite-timeout" value="30000"/>
+    
+    <!-- 启用 100rel (PRACK) -->
+    <param name="enable-100rel" value="true"/>
+    
+    <!-- NAT keepalive 间隔（秒） -->
+    <param name="nat-keepalive" value="30"/>
+    
+    <!-- RTP 超时（秒） -->
+    <param name="rtp-timeout-sec" value="300"/>
+    <param name="rtp-hold-timeout-sec" value="1800"/>
+    
+    <!-- 启用自动挂断选项 -->
+    <param name="auto-restart" value="false"/>
+    
+    <!-- 挑战过期时间（秒） -->
+    <param name="challenge-realm" value="auto_from"/>
+    
+  </settings>
+</profile>
+
+
+<!-- ============================================ -->
+<!-- 3. switch.conf.xml 核心配置 -->
+<!-- 路径: conf/autoload_configs/switch.conf.xml -->
+<!-- ============================================ -->
+
+<configuration name="switch.conf" description="Core Configuration">
+  <settings>
+    
+    <!-- 最大会话数 -->
+    <param name="max-sessions" value="1000"/>
+    
+    <!-- 每秒最大会话数（CPS限制） -->
+    <param name="sessions-per-second" value="30"/>
+    
+    <!-- 启用崩溃保护 -->
+    <param name="crash-protection" value="true"/>
+    
+    <!-- 最大数据库连接数 -->
+    <param name="max-db-handles" value="50"/>
+    
+    <!-- 数据库超时（毫秒） -->
+    <param name="db-handle-timeout" value="10000"/>
+    
+    <!-- 启用看门狗 -->
+    <param name="watchdog-enabled" value="true"/>
+    <param name="watchdog-step-timeout" value="30000"/>
+    <param name="watchdog-event-timeout" value="30000"/>
+    
+  </settings>
+</configuration>
+
+
+<!-- ============================================ -->
+<!-- 4. 拨号计划配置示例 -->
+<!-- 路径: conf/dialplan/default.xml 或自定义拨号计划 -->
+<!-- ============================================ -->
+
+<extension name="outbound_with_timeout">
+  <condition field="destination_number" expression="^9(\d+)$">
+    
+    <!-- 设置通话超时参数 -->
+    <action application="set" data="call_timeout=30"/>
+    <action application="set" data="hangup_after_bridge=true"/>
+    
+    <!-- 设置 RTP 超时 -->
+    <action application="set" data="rtp_timeout_sec=300"/>
+    <action application="set" data="rtp_hold_timeout_sec=1800"/>
+    
+    <!-- 设置最大通话时长（使用 sched_hangup） -->
+    <!-- 在3600秒（1小时）后自动挂断 -->
+    <action application="sched_hangup" data="+3600 alloted_timeout"/>
+    
+    <!-- 设置失败后继续 -->
+    <action application="set" data="continue_on_fail=true"/>
+    
+    <!-- 桥接呼叫 -->
+    <action application="bridge" data="{origination_caller_id_number=1234567890}sofia/gateway/mygateway/$1"/>
+    
+    <!-- 记录挂断原因 -->
+    <action application="log" data="WARNING Call ended with cause: ${hangup_cause}"/>
+    
+  </condition>
+</extension>
+
+<!-- 带内联超时参数的桥接示例 -->
+<extension name="outbound_inline_timeout">
+  <condition field="destination_number" expression="^8(\d+)$">
+    
+    <!-- 在桥接字符串中设置超时参数 -->
+    <action application="bridge" data="{call_timeout=30,origination_caller_id_number=1234567890,hangup_after_bridge=true}sofia/gateway/mygateway/$1"/>
+    
+  </condition>
+</extension>
+
+<!-- IVR 中的超时保护 -->
+<extension name="ivr_with_timeout">
+  <condition field="destination_number" expression="^7000$">
+    
+    <!-- 设置 IVR 超时 -->
+    <action application="set" data="ivr_menu_timeout=10000"/>
+    
+    <!-- 如果30秒内没有交互，自动挂断 -->
+    <action application="sched_hangup" data="+30 no_user_response"/>
+    
+    <!-- 执行 IVR -->
+    <action application="ivr" data="main_menu"/>
+    
+  </condition>
+</extension>
+
+
+<!-- ============================================ -->
+<!-- 5. 定时任务配置 (crontab) -->
+<!-- 用于定期清理和监控 -->
+<!-- ============================================ -->
+
+<!--
+添加到 crontab (crontab -e):
+
+# 每10分钟检查一次通道状态
+*/10 * * * * /path/to/monitor_channels.sh >> /var/log/freeswitch/monitor.log 2>&1
+
+# 每小时清理超过2小时的残留通道
+0 * * * * /path/to/cleanup_lingering_channels.sh -d 7200 >> /var/log/freeswitch/cleanup.log 2>&1
+
+# 每天凌晨2点生成诊断报告
+0 2 * * * /path/to/diagnose_channels.sh >> /var/log/freeswitch/diagnosis.log 2>&1
+-->
+
+
+<!-- ============================================ -->
+<!-- 6. Systemd Timer 配置示例（推荐） -->
+<!-- 比 cron 更可靠 -->
+<!-- ============================================ -->
+
+<!--
+创建 /etc/systemd/system/freeswitch-monitor.service:
+
+[Unit]
+Description=FreeSWITCH Channel Monitor
+After=freeswitch.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/monitor_channels.sh
+User=freeswitch
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target
+
+
+创建 /etc/systemd/system/freeswitch-monitor.timer:
+
+[Unit]
+Description=Run FreeSWITCH Channel Monitor every 10 minutes
+Requires=freeswitch-monitor.service
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=10min
+Unit=freeswitch-monitor.service
+
+[Install]
+WantedBy=timers.target
+
+
+启用定时器:
+systemctl daemon-reload
+systemctl enable freeswitch-monitor.timer
+systemctl start freeswitch-monitor.timer
+-->
+
+
+<!-- ============================================ -->
+<!-- 7. Lua 脚本超时保护示例 -->
+<!-- ============================================ -->
+
+<!--
+-- timeout_protection.lua
+local max_duration = 3600  -- 1小时
+
+-- 获取会话
+session = ...
+
+if session:ready() then
+    -- 设置挂断钩子
+    session:setHangupHook("on_hangup")
+    
+    -- 设置超时
+    session:setVariable("session_timeout", max_duration)
+    
+    -- 设置 RTP 超时
+    session:setVariable("rtp_timeout_sec", 300)
+    
+    -- 记录开始时间
+    local start_time = os.time()
+    
+    -- 你的业务逻辑
+    session:execute("playback", "/tmp/test.wav")
+    
+    -- 检查是否超时
+    local elapsed = os.time() - start_time
+    if elapsed > max_duration then
+        freeswitch.consoleLog("WARNING", "Session exceeded max duration\n")
+        session:hangup("ALLOTTED_TIMEOUT")
+    end
+end
+
+function on_hangup(s, status)
+    freeswitch.consoleLog("NOTICE", "Call ended: " .. status .. "\n")
+end
+-->
+
+
+<!-- ============================================ -->
+<!-- 8. Python ESL 脚本超时保护示例 -->
+<!-- ============================================ -->
+
+<!--
+# timeout_protection.py
+import ESL
+import time
+from contextlib import contextmanager
+
+@contextmanager
+def esl_connection(host='localhost', port=8021, password='ClueCon'):
+    """上下文管理器确保连接被正确关闭"""
+    con = ESL.ESLconnection(host, str(port), password)
+    try:
+        if con.connected():
+            yield con
+        else:
+            raise Exception("无法连接到 FreeSWITCH")
+    finally:
+        con.disconnect()
+
+def originate_with_timeout(destination, timeout=30, max_duration=3600):
+    """发起呼叫并设置超时"""
+    
+    with esl_connection() as con:
+        # 订阅事件
+        con.events("plain", "CHANNEL_HANGUP")
+        
+        # 构建 originate 命令
+        cmd = f"{{call_timeout={timeout},originate_timeout={timeout}}}sofia/gateway/mygateway/{destination}"
+        
+        # 发起呼叫
+        e = con.api("originate", cmd)
+        
+        if e:
+            uuid = e.getBody().strip()
+            print(f"Call UUID: {uuid}")
+            
+            # 设置最大通话时长
+            con.api("sched_hangup", f"+{max_duration} {uuid} alloted_timeout")
+            
+            # 等待挂断事件
+            start_time = time.time()
+            while time.time() - start_time < max_duration:
+                e = con.recvEvent()
+                if e:
+                    event_name = e.getHeader("Event-Name")
+                    if event_name == "CHANNEL_HANGUP":
+                        hangup_cause = e.getHeader("Hangup-Cause")
+                        print(f"Call ended: {hangup_cause}")
+                        break
+            else:
+                # 超时，强制挂断
+                print("Max duration reached, killing call")
+                con.api("uuid_kill", f"{uuid} ALLOTTED_TIMEOUT")
+
+if __name__ == "__main__":
+    originate_with_timeout("1234567890", timeout=30, max_duration=3600)
+-->
+
+
+<!-- ============================================ -->
+<!-- 9. 建议的配置检查清单 -->
+<!-- ============================================ -->
+
+<!--
+✓ 全局变量中设置了 rtp_timeout_sec 和 rtp_hold_timeout_sec
+✓ SIP Profile 中启用了 enable-timer 和 session-timeout
+✓ 拨号计划中使用了 hangup_after_bridge=true
+✓ 关键通话使用了 sched_hangup 设置最大时长
+✓ 配置了定期监控和清理脚本
+✓ 启用了日志记录以便排查问题
+✓ 测试了超时配置是否生效
+-->
