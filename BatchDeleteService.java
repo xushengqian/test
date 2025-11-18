@@ -8,7 +8,7 @@ public class BatchDeleteService {
     private static final int BATCH_SIZE = 1000;
     
     /**
-     * 分批删除记录（方案1：使用LIMIT，适用于MySQL）
+     * 分批删除记录（方案1：先计算批次数，然后使用for循环删除，适用于MySQL）
      * 
      * @param table 表名
      * @param indexId 索引ID
@@ -28,11 +28,13 @@ public class BatchDeleteService {
             return 0;
         }
         
-        int deletedCount = 0;
-        int batchCount = 0;
+        // 计算一共要执行多少批（向上取整）
+        int totalBatches = (totalCount + BATCH_SIZE - 1) / BATCH_SIZE;
         
-        // 循环分批删除，直到所有记录都被删除
-        while (deletedCount < totalCount) {
+        int deletedCount = 0;
+        
+        // 使用for循环分批删除
+        for (int batchNumber = 1; batchNumber <= totalBatches; batchNumber++) {
             // 构建分批删除的SQL，使用LIMIT限制每次删除的数量（MySQL语法）
             String sql = "delete from " + table 
                     + " where index_id = " + indexId 
@@ -41,16 +43,15 @@ public class BatchDeleteService {
             
             int affectedRows = customSqlExecuteService.executeCustomSqlUpdate(sql);
             
-            if (affectedRows == 0) {
-                // 如果没有删除任何记录，说明已经删除完毕，退出循环
-                break;
-            }
-            
             deletedCount += affectedRows;
-            batchCount++;
             
             // 可选：添加日志输出
-            System.out.println("第 " + batchCount + " 批删除完成，本批删除 " + affectedRows + " 条记录，累计删除 " + deletedCount + " 条记录");
+            System.out.println("第 " + batchNumber + "/" + totalBatches + " 批删除完成，本批删除 " + affectedRows + " 条记录，累计删除 " + deletedCount + " 条记录");
+            
+            // 如果本次删除的记录数为0，说明已经删除完毕，可以提前退出
+            if (affectedRows == 0) {
+                break;
+            }
             
             // 可选：添加短暂延迟，避免对数据库造成过大压力
             try {

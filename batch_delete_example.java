@@ -3,7 +3,7 @@
  * 基于您提供的代码进行改进，实现分批删除功能
  */
 
-// 方案1：最简单的实现（适用于MySQL等支持DELETE LIMIT的数据库）
+// 方案1：先计算批次数，然后使用for循环删除（适用于MySQL等支持DELETE LIMIT的数据库）
 String originSqlCount = "select count(*) as count from " + table 
         + " where index_id = " + indexId 
         + " and index_params = '" + indexParams + "'";
@@ -14,11 +14,11 @@ if (count == 0) {
 
 // 每批删除的记录数
 int batchSize = 1000;
-int deletedCount = 0;
-int batchNumber = 0;
+// 计算一共要执行多少批（向上取整）
+int totalBatches = (count + batchSize - 1) / batchSize;
 
-// 循环分批删除
-while (deletedCount < count) {
+// 使用for循环分批删除
+for (int batchNumber = 1; batchNumber <= totalBatches; batchNumber++) {
     String sql = "delete from " + table 
             + " where index_id = " + indexId 
             + " and index_params = '" + indexParams + "'"
@@ -26,19 +26,11 @@ while (deletedCount < count) {
     
     int affectedRows = customSqlExecuteService.executeCustomSqlUpdate(sql);
     
-    if (affectedRows == 0) {
-        // 没有删除任何记录，退出循环
-        break;
-    }
-    
-    deletedCount += affectedRows;
-    batchNumber++;
-    
     // 可选：记录日志
-    // logger.info("第{}批删除完成，删除{}条记录，累计删除{}条", batchNumber, affectedRows, deletedCount);
+    // logger.info("第{}/{}批删除完成，删除{}条记录", batchNumber, totalBatches, affectedRows);
     
-    // 如果本次删除的记录数小于批次大小，说明已经是最后一批
-    if (affectedRows < batchSize) {
+    // 如果本次删除的记录数为0，说明已经删除完毕，可以提前退出
+    if (affectedRows == 0) {
         break;
     }
     
