@@ -26,26 +26,17 @@ public class PerformanceDetailsDeleteService {
     /**
      * 方案1：分批删除（推荐）
      * 优点：避免长时间持有锁，减少死锁概率
+     * 
+     * 注意：需要在循环外部调用，每次循环调用 deleteOneBatch 会创建新事务
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public int deleteInBatches(Long indexId, String indexParams) {
         int totalDeleted = 0;
         int deletedCount;
         
         do {
-            // 使用 LIMIT 分批删除
-            deletedCount = jdbcTemplate.update(
-                "DELETE FROM ks_index_user_performance_details " +
-                "WHERE index_id = ? AND index_params = ? " +
-                "LIMIT ?",
-                indexId, indexParams, BATCH_SIZE
-            );
-            
+            // 每次调用都会创建新事务
+            deletedCount = deleteOneBatch(indexId, indexParams, BATCH_SIZE);
             totalDeleted += deletedCount;
-            
-            // 每批删除后提交事务，释放锁
-            // 注意：如果使用 @Transactional，需要手动提交
-            // 或者使用编程式事务管理
             
             // 短暂延迟，避免过度占用数据库资源
             if (deletedCount > 0) {
@@ -59,6 +50,19 @@ public class PerformanceDetailsDeleteService {
         } while (deletedCount > 0);
         
         return totalDeleted;
+    }
+    
+    /**
+     * 单批删除，使用独立事务
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    private int deleteOneBatch(Long indexId, String indexParams, int batchSize) {
+        return jdbcTemplate.update(
+            "DELETE FROM ks_index_user_performance_details " +
+            "WHERE index_id = ? AND index_params = ? " +
+            "LIMIT ?",
+            indexId, indexParams, batchSize
+        );
     }
 
     /**
