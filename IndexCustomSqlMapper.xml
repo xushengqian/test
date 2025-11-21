@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.springblade.modules.index.mapper.IndexCustomSqlMapper">
+
+    <!-- 原始删除SQL（存在死锁风险） -->
+    <delete id="updateCustomSql">
+        DELETE FROM ks_index_user_performance_details
+        WHERE index_id = #{indexId}
+          AND index_params = #{indexParams}
+        LIMIT #{limit}
+    </delete>
+
+    <!-- 优化后的批量删除（小批量，减少死锁） -->
+    <delete id="deleteInBatches">
+        DELETE FROM ks_index_user_performance_details
+        WHERE index_id = #{indexId}
+          AND index_params = #{indexParams}
+        LIMIT #{batchSize}
+    </delete>
+
+    <!-- 建议的索引创建SQL（需要在数据库中执行） -->
+    <!-- 
+    CREATE INDEX idx_index_id_params ON ks_index_user_performance_details(index_id, index_params);
+    -->
+
+</mapper>
