@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.springblade.modules.index.mapper.IndexCustomSqlMapper">
+    
+    <!-- 删除用户绩效明细 - 优化版本 -->
+    <delete id="updateCustomSql">
+        DELETE FROM ks_index_user_performance_details
+        WHERE index_id = #{indexId}
+          AND index_params = #{indexParams}
+        LIMIT #{limit}
+    </delete>
+    
+    <!-- 
+    优化建议：
+    1. 确保表上有以下索引：
+       - PRIMARY KEY (id) - 如果存在主键
+       - INDEX idx_index_id (index_id)
+       - INDEX idx_index_params (index_params)
+       - 或者复合索引：INDEX idx_index_id_params (index_id, index_params)
+    
+    2. 如果数据量很大，考虑分批删除：
+       - 每次删除较小的批次（如100条）
+       - 在循环中多次调用，每次调用后短暂休眠
+    -->
+</mapper>
