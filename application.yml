@@ -1,0 +1,12 @@
+# Spring Boot 应用配置示例
+# 注意：RestTemplate 的超时配置通常在 Java 配置类中完成
+# 但也可以通过以下方式在配置文件中设置（需要自定义配置类读取）
+
+spring:
+  application:
+    name: rest-template-demo
+
+# 自定义超时配置（可选，需要在配置类中读取）
+rest-template:
+  connect-timeout: 5000    # 连接超时：5秒（毫秒）
+  read-timeout: 10000      # 读取超时：10秒（毫秒）
