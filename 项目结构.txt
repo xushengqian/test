@@ -1,0 +1,207 @@
+Java HTTP 表单提交 byte[] 文件 - 项目结构
+═══════════════════════════════════════════════════════════════
+
+/workspace/
+│
+├─ 📚 核心示例（4个）- 不同实现方式
+│  ├─ HttpFormFileUploadExample.java ★★★★★
+│  │  └─ 使用原生 HttpURLConnection（无依赖，适合学习）
+│  │
+│  ├─ HttpClientFileUploadExample.java ★★★★★
+│  │  └─ 使用 Java 11+ HttpClient（现代化，推荐）
+│  │
+│  ├─ ApacheHttpClientExample.java ★★★★
+│  │  └─ 使用 Apache HttpClient（功能强大）
+│  │
+│  └─ SpringWebClientExample.java ★★★★
+│     └─ 使用 Spring WebClient/RestTemplate（Spring项目）
+│
+├─ 🛠️ 工具类（2个）- 实用工具
+│  ├─ FileUploadUtils.java ★★★★★ 【强烈推荐】
+│  │  ├─ 从文件路径上传
+│  │  ├─ 从 Base64 上传
+│  │  ├─ 从 InputStream 上传
+│  │  ├─ 批量上传
+│  │  ├─ 带参数上传
+│  │  └─ 自动 Content-Type 检测
+│  │
+│  └─ AdvancedExamples.java ★★★★★
+│     ├─ 进度监控上传
+│     ├─ 带重试机制上传
+│     ├─ 大文件分片上传
+│     ├─ 压缩上传
+│     ├─ 并发批量上传
+│     └─ 断点续传
+│
+├─ 🧪 测试工具（2个）- 本地测试
+│  ├─ SimpleUploadServer.java ★★★★★
+│  │  ├─ HTTP测试服务器（端口8080）
+│  │  ├─ 网页上传界面
+│  │  └─ 自动解析multipart数据
+│  │
+│  └─ QuickTest.java ★★★★
+│     ├─ 一键测试所有方法
+│     └─ 自动生成测试数据
+│
+├─ 📜 构建脚本（4个）- 自动化工具
+│  ├─ build.sh         (Linux/Mac 编译脚本)
+│  ├─ build.bat        (Windows 编译脚本)
+│  ├─ run-test.sh      (Linux/Mac 一键测试)
+│  └─ run-test.bat     (Windows 一键测试)
+│
+├─ 📖 文档（4个）- 学习资料
+│  ├─ README.md            ★★★★★ 【从这里开始】
+│  │  ├─ 快速开始
+│  │  ├─ 所有方法示例
+│  │  └─ 常见问题
+│  │
+│  ├─ 使用指南.md          ★★★★★ 【深入学习】
+│  │  ├─ 详细教程
+│  │  ├─ 完整场景
+│  │  └─ 最佳实践
+│  │
+│  ├─ PROJECT_SUMMARY.md   ★★★★
+│  │  ├─ 项目总结
+│  │  └─ 文件清单
+│  │
+│  └─ 项目结构.txt         ★★★
+│     └─ 可视化结构（本文件）
+│
+├─ ⚙️ 配置文件（2个）
+│  ├─ pom.xml          (Maven项目配置)
+│  └─ .gitignore       (Git忽略规则)
+│
+└─ 🗑️ 编译产物（自动生成，可忽略）
+   └─ *.class          (编译后的字节码文件)
+
+
+═══════════════════════════════════════════════════════════════
+                        使用流程图
+═══════════════════════════════════════════════════════════════
+
+新手入门:
+┌─────────────────────────────────────────────────────────────┐
+│ 1. 运行测试                                                   │
+│    bash run-test.sh  或  run-test.bat                        │
+│    └─> 了解基本功能                                          │
+│                                                               │
+│ 2. 阅读文档                                                   │
+│    README.md → 使用指南.md                                    │
+│    └─> 理解原理和用法                                        │
+│                                                               │
+│ 3. 查看代码                                                   │
+│    HttpFormFileUploadExample.java                            │
+│    └─> 学习实现方式                                          │
+│                                                               │
+│ 4. 实践应用                                                   │
+│    复制 FileUploadUtils.java 到你的项目                      │
+│    └─> 开始使用                                              │
+└─────────────────────────────────────────────────────────────┘
+
+
+进阶学习:
+┌─────────────────────────────────────────────────────────────┐
+│ 1. 研究高级示例                                               │
+│    AdvancedExamples.java                                     │
+│    └─> 掌握高级技巧                                          │
+│                                                               │
+│ 2. 对比不同实现                                               │
+│    HttpURLConnection vs HttpClient vs Apache vs Spring       │
+│    └─> 选择最适合的方案                                      │
+│                                                               │
+│ 3. 性能优化                                                   │
+│    使用指南.md → 最佳实践                                     │
+│    └─> 提升性能和稳定性                                      │
+│                                                               │
+│ 4. 自定义扩展                                                 │
+│    根据实际需求修改代码                                       │
+│    └─> 打造专属工具类                                        │
+└─────────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════
+                        推荐使用方案
+═══════════════════════════════════════════════════════════════
+
+场景1: 简单上传，无特殊要求
+推荐: FileUploadUtils.java
+代码: 
+    FileUploadUtils.uploadBytes(url, bytes, name, field, null)
+
+场景2: 需要显示进度
+推荐: AdvancedExamples.ProgressUploader
+代码:
+    ProgressUploader.uploadWithProgress(url, bytes, name, field, callback)
+
+场景3: 需要可靠性（自动重试）
+推荐: AdvancedExamples.RetryUploader
+代码:
+    RetryUploader.uploadWithRetry(url, bytes, name, field, 3)
+
+场景4: 大文件上传
+推荐: AdvancedExamples.ChunkedUploader
+代码:
+    ChunkedUploader.uploadLargeFile(url, bytes, name, field, chunkSize)
+
+场景5: 批量上传
+推荐: FileUploadUtils.uploadMultipleFiles
+代码:
+    uploadMultipleFiles(url, fileList, field)
+
+场景6: 异步上传（不阻塞）
+推荐: HttpClientFileUploadExample.uploadFileAsync
+代码:
+    uploadFileAsync(url, bytes, name, field)
+
+
+═══════════════════════════════════════════════════════════════
+                        快速命令参考
+═══════════════════════════════════════════════════════════════
+
+编译项目:
+  Linux/Mac:  bash build.sh
+  Windows:    build.bat
+
+运行测试:
+  Linux/Mac:  bash run-test.sh
+  Windows:    run-test.bat
+
+启动服务器:
+  java SimpleUploadServer
+  访问: http://localhost:8080
+
+运行快速测试:
+  java QuickTest
+
+编译单个文件:
+  javac FileName.java
+
+运行单个示例:
+  java ClassName
+
+
+═══════════════════════════════════════════════════════════════
+                        技术特点总结
+═══════════════════════════════════════════════════════════════
+
+✅ 零依赖可用      - 核心功能无需外部库
+✅ 跨平台支持      - Windows/Linux/Mac通用
+✅ 完整测试工具    - 本地服务器+自动化测试
+✅ 中文详细文档    - 易于理解和学习
+✅ 多种实现方式    - 适应不同项目需求
+✅ 生产级质量      - 包含错误处理和最佳实践
+✅ 易于集成        - 复制即用
+✅ 示例丰富        - 覆盖各种实际场景
+
+
+═══════════════════════════════════════════════════════════════
+                        版本信息
+═══════════════════════════════════════════════════════════════
+
+项目名称: Java HTTP 表单提交 byte[] 文件
+版本: 1.0.0
+创建日期: 2025-12-01
+语言要求: Java 11+
+License: MIT
+
+═══════════════════════════════════════════════════════════════
