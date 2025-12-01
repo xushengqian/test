@@ -1,0 +1,20 @@
+# FreeSWITCH 相关
+*.db
+*.log
+
+# 临时文件
+*.tmp
+*.bak
+*~
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 数据库文件
+freeswitch.db
+
+# 备份文件
+backup/

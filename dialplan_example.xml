@@ -1,0 +1,80 @@
+<!-- FreeSWITCH Dialplan 配置示例 -->
+<include>
+  <extension name="transfer_to_agent">
+    <condition field="destination_number" expression="^9000$">
+      <!-- 设置坐席号码 -->
+      <action application="set" data="agent_number=1001"/>
+      
+      <!-- 设置超时时间 -->
+      <action application="set" data="call_timeout=30"/>
+      
+      <!-- 失败后继续执行 -->
+      <action application="set" data="continue_on_fail=true"/>
+      
+      <!-- 记录桥接失败的原因 -->
+      <action application="set" data="hangup_after_bridge=false"/>
+      
+      <!-- 执行Lua脚本 -->
+      <action application="lua" data="transfer_to_agent.lua"/>
+      
+      <!-- 或者直接使用bridge -->
+      <!-- <action application="bridge" data="user/1001"/> -->
+      
+      <!-- 检查桥接结果 -->
+      <!-- <action application="log" data="INFO bridge_hangup_cause=${bridge_hangup_cause}"/> -->
+      
+      <!-- 如果转接失败，根据原因处理 -->
+      <!--
+      <action application="execute_on_answer" data="log INFO 转接成功"/>
+      -->
+    </condition>
+  </extension>
+  
+  <!-- 示例2: 带条件判断的转接 -->
+  <extension name="transfer_with_condition">
+    <condition field="destination_number" expression="^9001$">
+      <action application="set" data="agent_number=1001"/>
+      <action application="set" data="continue_on_fail=true"/>
+      
+      <!-- 先应答 -->
+      <action application="answer"/>
+      <action application="sleep" data="1000"/>
+      
+      <!-- 播放提示音 -->
+      <action application="playback" data="ivr/ivr-please_hold_while_party_contacted.wav"/>
+      
+      <!-- 尝试转接 -->
+      <action application="bridge" data="user/${agent_number}"/>
+      
+      <!-- 根据失败原因跳转 -->
+      <action application="execute_extension" data="handle_bridge_failure XML default"/>
+    </condition>
+  </extension>
+  
+  <!-- 处理转接失败 -->
+  <extension name="handle_bridge_failure">
+    <condition field="${bridge_hangup_cause}" expression="^USER_NOT_REGISTERED$">
+      <action application="log" data="WARNING 坐席未注册"/>
+      <action application="playback" data="ivr/ivr-no_user_response.wav"/>
+      <action application="hangup" data="NO_USER_RESPONSE"/>
+    </condition>
+    
+    <condition field="${bridge_hangup_cause}" expression="^NO_ANSWER$">
+      <action application="log" data="WARNING 坐席无应答"/>
+      <action application="playback" data="ivr/ivr-no_user_response.wav"/>
+      <action application="hangup" data="NO_ANSWER"/>
+    </condition>
+    
+    <condition field="${bridge_hangup_cause}" expression="^USER_BUSY$">
+      <action application="log" data="WARNING 坐席忙线"/>
+      <action application="playback" data="ivr/ivr-user_busy.wav"/>
+      <action application="hangup" data="USER_BUSY"/>
+    </condition>
+    
+    <condition field="${bridge_hangup_cause}" expression="^CALL_REJECTED$">
+      <action application="log" data="WARNING 坐席拒接"/>
+      <action application="playback" data="ivr/ivr-call_rejected.wav"/>
+      <action application="hangup" data="CALL_REJECTED"/>
+    </condition>
+  </extension>
+</include>
