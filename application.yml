@@ -1,0 +1,18 @@
+# RestTemplate 超时配置参数
+# 可以在配置文件中定义超时参数，然后在代码中读取
+
+rest:
+  template:
+    # 连接超时时间（秒）
+    connect-timeout: 5
+    # 读取超时时间（秒）
+    read-timeout: 10
+    # 连接请求超时时间（秒）
+    connection-request-timeout: 3
+
+# 或者使用毫秒单位
+rest-client:
+  timeouts:
+    connect-timeout-ms: 5000
+    read-timeout-ms: 10000
+    connection-request-timeout-ms: 3000
