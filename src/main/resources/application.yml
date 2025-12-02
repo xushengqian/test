@@ -1,0 +1,11 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: resttemplate-best-practices
+
+logging:
+  level:
+    com.example.resttemplate: INFO
+    org.springframework.web.client: DEBUG
