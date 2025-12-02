@@ -1,0 +1,49 @@
+# RestTemplate 配置示例
+spring:
+  application:
+    name: resttemplate-best-practices
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    # 打开 RestTemplate 的调试日志
+    org.springframework.web.client.RestTemplate: DEBUG
+    # 打开 Apache HttpClient 的日志
+    org.apache.http: DEBUG
+    # 自定义拦截器日志
+    com.example: DEBUG
+
+# 自定义 RestTemplate 配置
+rest:
+  client:
+    # 连接超时 (毫秒)
+    connect-timeout: 5000
+    # 读取超时 (毫秒)
+    read-timeout: 10000
+    # 连接池配置
+    pool:
+      max-total: 100
+      max-per-route: 20
+      connection-request-timeout: 3000
+    # 重试配置
+    retry:
+      max-attempts: 3
+      enable: true
+    # API 基础URL配置
+    api:
+      base-url: https://api.example.com
+      # 各个服务的具体URL
+      user-service: ${rest.client.api.base-url}/users
+      order-service: ${rest.client.api.base-url}/orders
+      payment-service: ${rest.client.api.base-url}/payments
+
+# 管理端点配置 (可选 - 用于监控)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  metrics:
+    enable:
+      http: true
