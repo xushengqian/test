@@ -1,0 +1,14 @@
+README.md
+setup.py
+tests/test_converter.py
+tests/test_core.py
+tests/test_mapper.py
+uuid_bridge/__init__.py
+uuid_bridge/converter.py
+uuid_bridge/core.py
+uuid_bridge/mapper.py
+uuid_bridge.egg-info/PKG-INFO
+uuid_bridge.egg-info/SOURCES.txt
+uuid_bridge.egg-info/dependency_links.txt
+uuid_bridge.egg-info/requires.txt
+uuid_bridge.egg-info/top_level.txt

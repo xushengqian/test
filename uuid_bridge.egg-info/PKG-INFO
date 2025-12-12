@@ -1,3 +1,24 @@
+Metadata-Version: 2.1
+Name: uuid-bridge
+Version: 1.0.0
+Summary: 一个功能完整的 Python UUID 桥接库
+Home-page: https://github.com/example/uuid_bridge
+Author: UUID Bridge Team
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+
 # UUID Bridge
 
 一个功能完整的 Python UUID 桥接库，提供 UUID 生成、格式转换和双向映射功能。
