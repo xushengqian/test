@@ -1,0 +1,231 @@
+# 默认IVR流程 - 客户服务热线
+id: default
+name: 默认客户服务热线
+description: 标准客户服务IVR流程，提供账户查询、业务办理、人工服务等选项
+version: "1.0"
+enabled: true
+entryNodeId: welcome
+defaultTimeout: 10000
+globalMaxRetries: 3
+invalidInputPrompt: /sounds/invalid_input.wav
+timeoutPrompt: /sounds/timeout.wav
+
+params:
+  dids:
+    - "4001234567"
+    - "4001234568"
+
+nodes:
+  # 欢迎语节点
+  - id: welcome
+    name: 欢迎语
+    type: WELCOME
+    prompt: "欢迎致电客户服务热线"
+    useTts: true
+    defaultNextNode: main_menu
+
+  # 主菜单节点
+  - id: main_menu
+    name: 主菜单
+    type: MENU
+    prompt: "账户查询请按1，业务办理请按2，投诉建议请按3，转人工服务请按0"
+    useTts: true
+    inputTimeout: 10000
+    maxRetries: 3
+    dtmfMapping:
+      "1": account_menu
+      "2": business_menu
+      "3": complaint
+      "0": transfer_agent
+    defaultNextNode: goodbye
+
+  # 账户查询子菜单
+  - id: account_menu
+    name: 账户查询菜单
+    type: MENU
+    prompt: "余额查询请按1，交易记录请按2，返回上级菜单请按星号"
+    useTts: true
+    inputTimeout: 10000
+    maxRetries: 3
+    dtmfMapping:
+      "1": balance_inquiry
+      "2": transaction_history
+      "*": main_menu
+    defaultNextNode: main_menu
+
+  # 余额查询
+  - id: balance_inquiry
+    name: 余额查询
+    type: ACTION
+    actionHandler: queryBalance
+    prompt: "正在查询您的账户余额，请稍候"
+    useTts: true
+    defaultNextNode: balance_result
+
+  # 余额查询结果
+  - id: balance_result
+    name: 余额查询结果
+    type: PLAY
+    prompt: "您的账户余额为"
+    useTts: true
+    defaultNextNode: account_menu
+
+  # 交易记录
+  - id: transaction_history
+    name: 交易记录
+    type: PLAY
+    prompt: "您最近的交易记录已发送到您的手机"
+    useTts: true
+    defaultNextNode: account_menu
+
+  # 业务办理子菜单
+  - id: business_menu
+    name: 业务办理菜单
+    type: MENU
+    prompt: "开通服务请按1，取消服务请按2，修改密码请按3，返回上级菜单请按星号"
+    useTts: true
+    inputTimeout: 10000
+    maxRetries: 3
+    dtmfMapping:
+      "1": activate_service
+      "2": cancel_service
+      "3": change_password
+      "*": main_menu
+    defaultNextNode: main_menu
+
+  # 开通服务
+  - id: activate_service
+    name: 开通服务
+    type: COLLECT
+    prompt: "请输入您要开通的服务代码，输入完成后按井号键确认"
+    useTts: true
+    inputTimeout: 15000
+    maxRetries: 2
+    params:
+      maxDigits: 6
+    defaultNextNode: service_confirm
+
+  # 服务确认
+  - id: service_confirm
+    name: 服务确认
+    type: MENU
+    prompt: "确认开通服务请按1，取消请按2"
+    useTts: true
+    inputTimeout: 10000
+    dtmfMapping:
+      "1": service_success
+      "2": business_menu
+    defaultNextNode: business_menu
+
+  # 服务开通成功
+  - id: service_success
+    name: 服务开通成功
+    type: PLAY
+    prompt: "服务开通成功，感谢您的使用"
+    useTts: true
+    defaultNextNode: main_menu
+
+  # 取消服务
+  - id: cancel_service
+    name: 取消服务
+    type: PLAY
+    prompt: "取消服务功能暂不可用，请联系人工客服"
+    useTts: true
+    defaultNextNode: business_menu
+
+  # 修改密码
+  - id: change_password
+    name: 修改密码
+    type: COLLECT
+    prompt: "请输入6位新密码，输入完成后按井号键确认"
+    useTts: true
+    inputTimeout: 15000
+    params:
+      maxDigits: 6
+    defaultNextNode: password_confirm
+
+  # 密码确认
+  - id: password_confirm
+    name: 密码确认
+    type: PLAY
+    prompt: "密码修改成功"
+    useTts: true
+    defaultNextNode: main_menu
+
+  # 投诉建议
+  - id: complaint
+    name: 投诉建议
+    type: RECORD
+    prompt: "请在提示音后说出您的投诉或建议，说完后请按井号键结束"
+    useTts: true
+    params:
+      maxDuration: 60
+      silenceThreshold: 3
+    defaultNextNode: complaint_thanks
+
+  # 投诉感谢
+  - id: complaint_thanks
+    name: 投诉感谢
+    type: PLAY
+    prompt: "感谢您的宝贵意见，我们会尽快处理"
+    useTts: true
+    defaultNextNode: main_menu
+
+  # 转人工服务
+  - id: transfer_agent
+    name: 转人工服务
+    type: TRANSFER_AGENT
+    prompt: "正在为您转接人工客服，请稍候"
+    useTts: true
+    agentGroup: customer_service
+    skillGroup: general
+    defaultNextNode: transfer_failed
+
+  # 转接失败
+  - id: transfer_failed
+    name: 转接失败
+    type: MENU
+    prompt: "当前坐席全忙，继续等待请按1，留言请按2，稍后再试请按0"
+    useTts: true
+    inputTimeout: 10000
+    dtmfMapping:
+      "1": queue_wait
+      "2": leave_message
+      "0": goodbye
+    defaultNextNode: goodbye
+
+  # 队列等待
+  - id: queue_wait
+    name: 队列等待
+    type: QUEUE
+    prompt: "您正在排队等待，请稍候"
+    useTts: true
+    params:
+      queueName: customer_service_queue
+      holdMusic: /sounds/hold_music.wav
+
+  # 留言
+  - id: leave_message
+    name: 留言
+    type: RECORD
+    prompt: "请在提示音后留言，留言完成后按井号键结束"
+    useTts: true
+    params:
+      maxDuration: 120
+      silenceThreshold: 5
+    defaultNextNode: message_thanks
+
+  # 留言感谢
+  - id: message_thanks
+    name: 留言感谢
+    type: PLAY
+    prompt: "感谢您的留言，我们会尽快回复您"
+    useTts: true
+    defaultNextNode: goodbye
+
+  # 结束语
+  - id: goodbye
+    name: 结束语
+    type: HANGUP
+    prompt: "感谢您的来电，再见"
+    useTts: true

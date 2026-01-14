@@ -1,0 +1,125 @@
+# 满意度调查IVR流程
+id: survey
+name: 满意度调查
+description: 客户满意度调查IVR流程
+version: "1.0"
+enabled: true
+entryNodeId: intro
+defaultTimeout: 10000
+globalMaxRetries: 2
+
+nodes:
+  # 介绍
+  - id: intro
+    name: 调查介绍
+    type: WELCOME
+    prompt: "您好，为了提升我们的服务质量，想占用您一分钟时间进行满意度调查"
+    useTts: true
+    defaultNextNode: willing_menu
+
+  # 是否愿意参与
+  - id: willing_menu
+    name: 参与确认
+    type: MENU
+    prompt: "愿意参与请按1，不参与请按2"
+    useTts: true
+    inputTimeout: 8000
+    dtmfMapping:
+      "1": question1
+      "2": decline_thanks
+    defaultNextNode: decline_thanks
+
+  # 问题1
+  - id: question1
+    name: 问题1
+    type: MENU
+    prompt: "请对我们的服务态度进行评分，非常满意请按5，满意请按4，一般请按3，不满意请按2，非常不满意请按1"
+    useTts: true
+    inputTimeout: 10000
+    dtmfMapping:
+      "1": save_q1
+      "2": save_q1
+      "3": save_q1
+      "4": save_q1
+      "5": save_q1
+    defaultNextNode: question2
+
+  # 保存问题1答案
+  - id: save_q1
+    name: 保存问题1
+    type: ACTION
+    actionHandler: saveSurveyAnswer
+    params:
+      question: service_attitude
+    defaultNextNode: question2
+
+  # 问题2
+  - id: question2
+    name: 问题2
+    type: MENU
+    prompt: "请对我们的响应速度进行评分，非常满意请按5，满意请按4，一般请按3，不满意请按2，非常不满意请按1"
+    useTts: true
+    inputTimeout: 10000
+    dtmfMapping:
+      "1": save_q2
+      "2": save_q2
+      "3": save_q2
+      "4": save_q2
+      "5": save_q2
+    defaultNextNode: question3
+
+  # 保存问题2答案
+  - id: save_q2
+    name: 保存问题2
+    type: ACTION
+    actionHandler: saveSurveyAnswer
+    params:
+      question: response_speed
+    defaultNextNode: question3
+
+  # 问题3
+  - id: question3
+    name: 问题3
+    type: MENU
+    prompt: "请对我们的整体服务进行评分，非常满意请按5，满意请按4，一般请按3，不满意请按2，非常不满意请按1"
+    useTts: true
+    inputTimeout: 10000
+    dtmfMapping:
+      "1": save_q3
+      "2": save_q3
+      "3": save_q3
+      "4": save_q3
+      "5": save_q3
+    defaultNextNode: survey_complete
+
+  # 保存问题3答案
+  - id: save_q3
+    name: 保存问题3
+    type: ACTION
+    actionHandler: saveSurveyAnswer
+    params:
+      question: overall_service
+    defaultNextNode: survey_complete
+
+  # 调查完成
+  - id: survey_complete
+    name: 调查完成
+    type: PLAY
+    prompt: "感谢您的参与，您的反馈对我们非常重要"
+    useTts: true
+    defaultNextNode: goodbye
+
+  # 拒绝参与感谢
+  - id: decline_thanks
+    name: 拒绝感谢
+    type: PLAY
+    prompt: "好的，感谢您的时间"
+    useTts: true
+    defaultNextNode: goodbye
+
+  # 结束
+  - id: goodbye
+    name: 结束
+    type: HANGUP
+    prompt: "再见"
+    useTts: true

@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ivr-system
+
+# FreeSWITCH ESL配置
+freeswitch:
+  host: 127.0.0.1
+  port: 8021
+  password: ClueCon
+  timeout: 30000
+  auto-connect: true
+  reconnect-interval: 5000
+  max-reconnect-attempts: 10
+  tts-engine: flite
+  tts-voice: kal
+  default-gateway: default
+  recording-path: /tmp/recordings
+  event-logging: false
+
+# IVR系统配置
+ivr:
+  flow-path: classpath:flows/*.yml
+  default-flow: default
+  default-timeout: 10000
+  default-max-retries: 3
+  invalid-input-prompt: "抱歉，您的输入无效，请重新输入"
+  timeout-prompt: "未检测到输入，请重新输入"
+  error-prompt: "系统繁忙，请稍后再试"
+  asr-enabled: false
+  asr-engine: default
+  session-timeout: 300
+  debug: false
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.ivr.system: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

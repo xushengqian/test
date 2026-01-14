@@ -1,0 +1,71 @@
+# 外呼IVR流程 - 自动外呼通知
+id: outbound
+name: 外呼通知流程
+description: 用于自动外呼通知客户的IVR流程
+version: "1.0"
+enabled: true
+entryNodeId: greeting
+defaultTimeout: 8000
+globalMaxRetries: 2
+
+nodes:
+  # 问候语
+  - id: greeting
+    name: 问候语
+    type: WELCOME
+    prompt: "您好，这里是客户服务中心"
+    useTts: true
+    defaultNextNode: notification
+
+  # 通知内容
+  - id: notification
+    name: 通知内容
+    type: PLAY
+    prompt: "您有一条重要通知"
+    useTts: true
+    defaultNextNode: confirm_menu
+
+  # 确认菜单
+  - id: confirm_menu
+    name: 确认菜单
+    type: MENU
+    prompt: "已了解请按1，重听请按2，转人工请按0"
+    useTts: true
+    inputTimeout: 8000
+    maxRetries: 2
+    dtmfMapping:
+      "1": confirmed
+      "2": notification
+      "0": transfer_human
+    defaultNextNode: no_response
+
+  # 已确认
+  - id: confirmed
+    name: 已确认
+    type: ACTION
+    actionHandler: markConfirmed
+    defaultNextNode: goodbye
+
+  # 转人工
+  - id: transfer_human
+    name: 转人工
+    type: TRANSFER_AGENT
+    prompt: "正在为您转接人工客服"
+    useTts: true
+    agentGroup: outbound_support
+    defaultNextNode: goodbye
+
+  # 无响应
+  - id: no_response
+    name: 无响应
+    type: PLAY
+    prompt: "未收到您的确认，稍后我们会再次联系您"
+    useTts: true
+    defaultNextNode: goodbye
+
+  # 结束
+  - id: goodbye
+    name: 结束
+    type: HANGUP
+    prompt: "感谢您的接听，再见"
+    useTts: true
