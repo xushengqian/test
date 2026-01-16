@@ -1,0 +1,9 @@
+{
+  "name": "uuid-displace-demo",
+  "version": "1.0.0",
+  "description": "Demo for handling audio streams with uuid",
+  "main": "src/index.js",
+  "dependencies": {
+    "uuid": "^9.0.0"
+  }
+}
