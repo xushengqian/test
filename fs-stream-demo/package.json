@@ -1,0 +1,12 @@
+{
+  "name": "freeswitch-stream-playback-demo",
+  "version": "1.0.0",
+  "description": "Demo for FreeSWITCH stream playback and interruption via ESL",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "modesl": "^1.2.1"
+  }
+}
