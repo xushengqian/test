@@ -1,0 +1,30 @@
+<include>
+  <!-- 
+    FreeSWITCH HTTP 音频流播放示例 
+    需要加载 mod_shout 模块
+  -->
+  <extension name="play_http_stream">
+    <!-- 匹配分机号 9999 -->
+    <condition field="destination_number" expression="^9999$">
+      <action application="answer"/>
+      
+      <!-- 
+        优化网络流播放体验：
+        shout_buffer_seconds: 设置缓冲区的音频秒数，默认为 5 秒。
+        增加此值可以减少因网络抖动导致的卡顿，但会增加延迟。
+      -->
+      <action application="set" data="shout_buffer_seconds=5"/>
+      
+      <!-- 
+        播放音频流：
+        使用 shout:// 前缀强制使用 mod_shout 模块处理流。
+        这适用于 Shoutcast/Icecast MP3 流。
+        如果 URL 是 http:// 开头，FreeSWITCH 可能会尝试下载整个文件（取决于配置和文件类型）。
+      -->
+      <action application="playback" data="shout://icecast.stream.example.com/radio.mp3"/>
+      
+      <!-- 播放结束后挂断 -->
+      <action application="hangup"/>
+    </condition>
+  </extension>
+</include>
