@@ -1,0 +1,45 @@
+<include>
+  <!-- 
+    FreeSwitch Audio Stream Demo Configuration
+    
+    This file demonstrates how to play audio streams (like internet radio)
+    using FreeSwitch dialplan.
+    
+    Prerequisites:
+    - mod_shout must be loaded for MP3/HTTP stream support.
+    - mod_lua must be loaded for the Lua script example.
+  -->
+
+  <!-- Extension 1: Play audio stream directly using mod_shout -->
+  <extension name="play_stream_direct">
+    <condition field="destination_number" expression="^9999$">
+      <action application="answer"/>
+      <action application="sleep" data="1000"/>
+      <action application="log" data="INFO Starting audio stream playback (Direct)..."/>
+      
+      <!-- 
+           Format: shout://<server>/<mount> or http://<server>/<file.mp3>
+           Note: 'shout://' forces the use of mod_shout.
+           Example stream: FIP Radio (France) - stable public stream
+      -->
+      <action application="playback" data="shout://icecast.radiofrance.fr/fip-midfi.mp3"/>
+      
+      <action application="log" data="INFO Audio stream playback finished."/>
+      <action application="hangup"/>
+    </condition>
+  </extension>
+
+  <!-- Extension 2: Play audio stream using Lua script -->
+  <extension name="play_stream_lua">
+    <condition field="destination_number" expression="^9998$">
+      <action application="answer"/>
+      <action application="sleep" data="1000"/>
+      <action application="log" data="INFO Starting audio stream playback (Lua)..."/>
+      
+      <!-- Call the Lua script located in scripts/ directory -->
+      <action application="lua" data="play_stream.lua"/>
+      
+      <action application="hangup"/>
+    </condition>
+  </extension>
+</include>
