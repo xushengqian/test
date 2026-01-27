@@ -1,0 +1,83 @@
+<include>
+  <!-- 
+    FreeSWITCH VAD 和降噪配置示例 
+    此文件应放置在 conf/dialplan/default/ 目录下
+  -->
+
+  <!-- 示例 1: 简单的 VAD 开启 (RTP 层面节省带宽) -->
+  <extension name="vad_enable_example">
+    <condition field="destination_number" expression="^9001$">
+      <action application="answer"/>
+      <action application="sleep" data="1000"/>
+      
+      <!-- 开启 RTP VAD (CNG) -->
+      <!-- 当检测到静音时，停止发送音频包，发送 CNG 包 -->
+      <action application="set" data="vad_enable=true"/>
+      
+      <!-- VAD 阈值 (能量值，默认可能在 0-2000 之间，需测试) -->
+      <!-- <action application="set" data="vad_threshold=500"/> -->
+      
+      <!-- VAD 静音判定时长 (毫秒) -->
+      <!-- <action application="set" data="vad_silence_ms=500"/> -->
+      
+      <action application="echo"/>
+    </condition>
+  </extension>
+
+  <!-- 示例 2: 使用 detect_silence 进行业务逻辑控制 (如静音自动挂断) -->
+  <extension name="silence_detection_example">
+    <condition field="destination_number" expression="^9002$">
+      <action application="answer"/>
+      
+      <!-- 
+        detect_silence <duration> <threshold> <timeout> <file>
+        duration: 持续静音多少毫秒触发
+        threshold: 能量阈值 (建议 20-500)
+        timeout: 总检测时间 (可选)
+        file: 可选，背景音
+      -->
+      <action application="detect_silence" data="3000 200 60000"/>
+      
+      <!-- 如果检测到静音，会触发 execute_on_silence (如果有设置) 或者继续执行 -->
+      <action application="playback" data="ivr/ivr-thank_you.wav"/>
+      <action application="hangup"/>
+    </condition>
+  </extension>
+
+  <!-- 示例 3: 开启 RNNoise 降噪 (需要 mod_rnnoise) -->
+  <extension name="noise_reduction_rnnoise">
+    <condition field="destination_number" expression="^9003$">
+      <action application="answer"/>
+      
+      <!-- 检查模块是否加载 -->
+      <action application="log" data="INFO Starting Noise Reduction check..."/>
+      
+      <!-- 
+        mod_rnnoise 用法通常是: uuid_rnnoise <uuid> [on|off]
+        在 Dialplan 中可以使用 set 变量或 execute_on_answer
+        这里假设使用 API 命令方式开启
+      -->
+      <!-- 为当前 Channel 开启降噪 -->
+      <action application="set" data="execute_on_answer=rnnoise_start"/>
+      
+      <!-- 或者直接作为 App 调用 (取决于模块版本) -->
+      <!-- <action application="rnnoise_start"/> -->
+
+      <action application="echo"/>
+    </condition>
+  </extension>
+  
+    <!-- 示例 4: 开启 WebRTC 降噪 (需要 mod_webrtc) -->
+  <extension name="noise_reduction_webrtc">
+    <condition field="destination_number" expression="^9004$">
+      <action application="answer"/>
+      <!-- 开启 WebRTC 的噪声抑制 -->
+      <action application="set" data="webrtc_enable_noise_suppression=true"/>
+      <!-- 开启 WebRTC 的自动增益控制 (可选) -->
+      <action application="set" data="webrtc_enable_agc=true"/>
+      
+      <action application="echo"/>
+    </condition>
+  </extension>
+
+</include>
