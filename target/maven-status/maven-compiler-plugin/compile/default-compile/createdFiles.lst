@@ -1,6 +1,0 @@
-com/example/audio/converter/Example.class
-com/example/audio/converter/PcmToMp3Converter.class
-com/example/audio/converter/AudioConfig.class
-com/example/audio/converter/PcmToMp3Converter$StreamEncoder.class
-com/example/audio/converter/Mp3EncoderOutputStream.class
-com/example/audio/converter/RealtimePcmToMp3Converter.class
