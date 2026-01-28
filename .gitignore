@@ -1,0 +1,9 @@
+target/
+bin/
+lib/
+*.class
+*.pcm
+*.mp3
+.idea/
+*.iml
+.DS_Store
