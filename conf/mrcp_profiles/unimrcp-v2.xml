@@ -1,0 +1,35 @@
+<include>
+  <!-- UniMRCP Server MRCPv2 Profile for ASR -->
+  <profile name="unimrcpv2-asr" version="2">
+    <param name="client-ip" value="$${local_ip_v4}"/>
+    <param name="client-port" value="16090"/>
+    <param name="server-ip" value="127.0.0.1"/>
+    <param name="server-port" value="8060"/>
+    <param name="sip-transport" value="udp"/>
+    <param name="ua-name" value="FreeSWITCH"/>
+    <param name="sdp-origin" value="FreeSWITCH"/>
+    <param name="rtp-ip" value="$${local_ip_v4}"/>
+    <param name="rtp-port-min" value="4000"/>
+    <param name="rtp-port-max" value="5000"/>
+    <param name="codecs" value="PCMU PCMA L16/96/8000"/>
+    
+    <recogparams>
+      <param name="start-input-timers" value="false"/>
+    </recogparams>
+  </profile>
+
+  <!-- UniMRCP Server MRCPv2 Profile for TTS -->
+  <profile name="unimrcpv2-tts" version="2">
+    <param name="client-ip" value="$${local_ip_v4}"/>
+    <param name="client-port" value="16090"/>
+    <param name="server-ip" value="127.0.0.1"/>
+    <param name="server-port" value="8060"/>
+    <param name="sip-transport" value="udp"/>
+    <param name="ua-name" value="FreeSWITCH"/>
+    <param name="sdp-origin" value="FreeSWITCH"/>
+    <param name="rtp-ip" value="$${local_ip_v4}"/>
+    <param name="rtp-port-min" value="4000"/>
+    <param name="rtp-port-max" value="5000"/>
+    <param name="codecs" value="PCMU PCMA L16/96/8000"/>
+  </profile>
+</include>
