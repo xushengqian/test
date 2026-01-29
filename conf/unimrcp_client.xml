@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  UniMRCP Client Configuration
+  
+  This is the native UniMRCP client configuration file.
+  Place this file in your FreeSWITCH conf directory.
+  
+  For detailed configuration options, refer to:
+  https://www.unimrcp.org/manuals/client-configuration
+-->
+<unimrcpclient xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="unimrcpclient.xsd"
+               version="1.0">
+
+  <!-- Properties -->
+  <properties>
+    <!-- Enable/disable IP type preferences -->
+    <ip type="auto" preference="4"/>
+    
+    <!-- Enable/disable ext-ip-address specification -->
+    <!-- <ext-ip type="auto">external-ip</ext-ip> -->
+  </properties>
+
+  <!-- Component factory -->
+  <components>
+    <!-- Resource factory -->
+    <resource-factory>
+      <resource id="speechsynth" enable="true"/>
+      <resource id="speechrecog" enable="true"/>
+      <resource id="recorder" enable="true"/>
+      <resource id="speakverify" enable="false"/>
+    </resource-factory>
+
+    <!-- SIP User Agent (used for MRCPv2) -->
+    <sip-uac id="SIP-Agent-1" type="SofiaSIP">
+      <!-- SIP settings -->
+      <sip-ip>0.0.0.0</sip-ip>
+      <sip-port>8062</sip-port>
+      <sip-transport>udp,tcp</sip-transport>
+      
+      <!-- SIP timers -->
+      <ua-name>FreeSWITCH-UniMRCP</ua-name>
+      <sdp-origin>FreeSWITCH-UniMRCP</sdp-origin>
+      
+      <!-- SIP message logging -->
+      <sip-message-output>true</sip-message-output>
+      <sip-message-dump>sofia-sip</sip-message-dump>
+    </sip-uac>
+
+    <!-- MRCPv2 connection agent -->
+    <mrcpv2-uac id="MRCPv2-Agent-1">
+      <max-connection-count>100</max-connection-count>
+      <max-shared-use-count>10</max-shared-use-count>
+      <offer-new-connection>true</offer-new-connection>
+      <rx-buffer-size>1024</rx-buffer-size>
+      <tx-buffer-size>1024</tx-buffer-size>
+      <request-timeout>30000</request-timeout>
+    </mrcpv2-uac>
+
+    <!-- MRCPv1 connection agent (RTSP) -->
+    <mrcpv1-uac id="MRCPv1-Agent-1">
+      <max-connection-count>100</max-connection-count>
+      <max-shared-use-count>10</max-shared-use-count>
+      <offer-new-connection>true</offer-new-connection>
+      <request-timeout>30000</request-timeout>
+      <sdp-origin>FreeSWITCH-UniMRCP</sdp-origin>
+    </mrcpv1-uac>
+
+    <!-- Media processing entity -->
+    <media-engine id="Media-Engine-1">
+      <realtime-rate>1</realtime-rate>
+    </media-engine>
+
+    <!-- RTP factory -->
+    <rtp-factory id="RTP-Factory-1">
+      <rtp-ip>0.0.0.0</rtp-ip>
+      <rtp-port-min>4000</rtp-port-min>
+      <rtp-port-max>5000</rtp-port-max>
+    </rtp-factory>
+  </components>
+
+  <!-- Settings -->
+  <settings>
+    <!-- RTCP settings -->
+    <rtcp enable="false">
+      <rtcp-bye-policy>1</rtcp-bye-policy>
+      <rtcp-tx-interval>5000</rtcp-tx-interval>
+      <rtcp-rx-resolution>1000</rtcp-rx-resolution>
+    </rtcp>
+
+    <!-- RTP settings -->
+    <rtp-settings id="RTP-Settings-1">
+      <jitter-buffer>
+        <adaptive>1</adaptive>
+        <playout-delay>50</playout-delay>
+        <max-playout-delay>600</max-playout-delay>
+        <time-skew-detection>1</time-skew-detection>
+      </jitter-buffer>
+      <ptime>20</ptime>
+      <codecs own-preference="false">
+        <codec name="PCMU" priority="1"/>
+        <codec name="PCMA" priority="2"/>
+        <codec name="L16/8000" priority="3"/>
+        <codec name="L16/16000" priority="4"/>
+      </codecs>
+    </rtp-settings>
+  </settings>
+
+  <!-- Profiles -->
+  <profiles>
+    <!-- Default MRCPv2 Profile -->
+    <mrcpv2-profile id="default">
+      <sip-uac>SIP-Agent-1</sip-uac>
+      <mrcpv2-uac>MRCPv2-Agent-1</mrcpv2-uac>
+      <media-engine>Media-Engine-1</media-engine>
+      <rtp-factory>RTP-Factory-1</rtp-factory>
+      <rtp-settings>RTP-Settings-1</rtp-settings>
+      
+      <!-- Server location -->
+      <sip-settings>
+        <server-ip>127.0.0.1</server-ip>
+        <server-port>8060</server-port>
+        <force-destination>true</force-destination>
+      </sip-settings>
+    </mrcpv2-profile>
+
+    <!-- MRCPv1 Profile (for legacy servers) -->
+    <mrcpv1-profile id="mrcpv1">
+      <mrcpv1-uac>MRCPv1-Agent-1</mrcpv1-uac>
+      <media-engine>Media-Engine-1</media-engine>
+      <rtp-factory>RTP-Factory-1</rtp-factory>
+      <rtp-settings>RTP-Settings-1</rtp-settings>
+      
+      <!-- Server location -->
+      <rtsp-settings>
+        <server-ip>127.0.0.1</server-ip>
+        <server-port>554</server-port>
+        <resource-location>media</resource-location>
+        <force-destination>true</force-destination>
+      </rtsp-settings>
+    </mrcpv1-profile>
+  </profiles>
+
+</unimrcpclient>

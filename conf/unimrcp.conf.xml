@@ -1,0 +1,127 @@
+<!--
+  UniMRCP Module Configuration File
+  
+  This file configures the mod_unimrcp module for FreeSWITCH.
+  Copy this file to your FreeSWITCH conf/autoload_configs/ directory.
+-->
+<configuration name="unimrcp.conf" description="UniMRCP Module Configuration">
+
+  <!-- Global Settings -->
+  <settings>
+    <!-- Default MRCP profile for ASR (speech recognition) -->
+    <param name="default-asr-profile" value="default"/>
+    
+    <!-- Default MRCP profile for TTS (text-to-speech) -->
+    <param name="default-tts-profile" value="default"/>
+    
+    <!-- Log level: debug, info, notice, warning, error, crit, alert -->
+    <param name="log-level" value="debug"/>
+    
+    <!-- Maximum number of MRCP connections -->
+    <param name="max-connection-count" value="100"/>
+    
+    <!-- Whether to offer new connections when pool is exhausted -->
+    <param name="offer-new-connection" value="true"/>
+    
+    <!-- Request timeout in milliseconds -->
+    <param name="request-timeout" value="30000"/>
+  </settings>
+
+  <!-- MRCP Server Profiles -->
+  <profiles>
+    
+    <!-- Default Profile - Configure for your MRCP server -->
+    <profile name="default">
+      <!-- MRCP server IP address -->
+      <param name="server-ip" value="127.0.0.1"/>
+      
+      <!-- MRCP server SIP port (MRCPv2) or direct port (MRCPv1) -->
+      <param name="server-port" value="8060"/>
+      
+      <!-- Client IP for SIP/MRCP signaling (0.0.0.0 = auto-detect) -->
+      <param name="client-ip" value="0.0.0.0"/>
+      
+      <!-- Client port for SIP signaling (0 = auto-assign) -->
+      <param name="client-port" value="0"/>
+      
+      <!-- MRCP version: 1 or 2 -->
+      <param name="mrcp-version" value="2"/>
+      
+      <!-- Audio codec: PCMU, PCMA, L16 -->
+      <param name="codec" value="PCMU"/>
+      
+      <!-- Sample rate: 8000 or 16000 -->
+      <param name="sample-rate" value="8000"/>
+      
+      <!-- SIP transport: udp, tcp, tls -->
+      <param name="sip-transport" value="udp"/>
+      
+      <!-- RTP settings -->
+      <param name="rtp-ip" value="0.0.0.0"/>
+      <param name="rtp-port-min" value="4000"/>
+      <param name="rtp-port-max" value="5000"/>
+    </profile>
+
+    <!-- Example: Nuance Profile -->
+    <profile name="nuance">
+      <param name="server-ip" value="nuance-server.example.com"/>
+      <param name="server-port" value="5060"/>
+      <param name="client-ip" value="0.0.0.0"/>
+      <param name="client-port" value="0"/>
+      <param name="mrcp-version" value="2"/>
+      <param name="codec" value="PCMU"/>
+      <param name="sample-rate" value="8000"/>
+      <param name="sip-transport" value="tcp"/>
+      <param name="rtp-ip" value="0.0.0.0"/>
+      <param name="rtp-port-min" value="4000"/>
+      <param name="rtp-port-max" value="5000"/>
+    </profile>
+
+    <!-- Example: Google Cloud Speech Profile -->
+    <profile name="google">
+      <param name="server-ip" value="google-mrcp.example.com"/>
+      <param name="server-port" value="8060"/>
+      <param name="client-ip" value="0.0.0.0"/>
+      <param name="client-port" value="0"/>
+      <param name="mrcp-version" value="2"/>
+      <param name="codec" value="L16"/>
+      <param name="sample-rate" value="16000"/>
+      <param name="sip-transport" value="tcp"/>
+      <param name="rtp-ip" value="0.0.0.0"/>
+      <param name="rtp-port-min" value="6000"/>
+      <param name="rtp-port-max" value="7000"/>
+    </profile>
+
+    <!-- Example: Baidu Speech Profile (for Chinese) -->
+    <profile name="baidu">
+      <param name="server-ip" value="baidu-mrcp.example.com"/>
+      <param name="server-port" value="8060"/>
+      <param name="client-ip" value="0.0.0.0"/>
+      <param name="client-port" value="0"/>
+      <param name="mrcp-version" value="2"/>
+      <param name="codec" value="PCMU"/>
+      <param name="sample-rate" value="8000"/>
+      <param name="sip-transport" value="udp"/>
+      <param name="rtp-ip" value="0.0.0.0"/>
+      <param name="rtp-port-min" value="4000"/>
+      <param name="rtp-port-max" value="5000"/>
+    </profile>
+
+    <!-- Example: Alibaba/Aliyun Speech Profile (for Chinese) -->
+    <profile name="aliyun">
+      <param name="server-ip" value="aliyun-mrcp.example.com"/>
+      <param name="server-port" value="8060"/>
+      <param name="client-ip" value="0.0.0.0"/>
+      <param name="client-port" value="0"/>
+      <param name="mrcp-version" value="2"/>
+      <param name="codec" value="PCMU"/>
+      <param name="sample-rate" value="16000"/>
+      <param name="sip-transport" value="tcp"/>
+      <param name="rtp-ip" value="0.0.0.0"/>
+      <param name="rtp-port-min" value="4000"/>
+      <param name="rtp-port-max" value="5000"/>
+    </profile>
+
+  </profiles>
+
+</configuration>
