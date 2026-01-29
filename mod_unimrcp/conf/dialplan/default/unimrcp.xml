@@ -1,0 +1,12 @@
+<include>
+  <extension name="unimrcp_demo">
+    <condition field="destination_number" expression="^9191$">
+      <action application="answer"/>
+      <!-- Call the skeleton app. Replace parameters after you implement real logic. -->
+      <action application="unimrcp" data="demo=true"/>
+      <action application="log" data="INFO unimrcp_last_app_data=${unimrcp_last_app_data} unimrcp_last_app_status=${unimrcp_last_app_status}"/>
+      <action application="hangup"/>
+    </condition>
+  </extension>
+</include>
+

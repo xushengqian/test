@@ -1,0 +1,11 @@
+<configuration name="unimrcp.conf" description="UniMRCP module configuration (skeleton)">
+  <settings>
+    <!--
+      Skeleton placeholders.
+      Implement real parsing/behavior inside mod_unimrcp.c as you integrate UniMRCP.
+    -->
+    <param name="enabled" value="true"/>
+    <param name="default_profile" value="default"/>
+  </settings>
+</configuration>
+
