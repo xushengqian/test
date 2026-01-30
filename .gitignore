@@ -1,0 +1,13 @@
+*.log
+*.pid
+*.swp
+.DS_Store
+
+# local build artifacts / clones
+freeswitch/
+build/
+dist/
+
+# editor
+.idea/
+.vscode/
