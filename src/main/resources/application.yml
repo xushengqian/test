@@ -1,0 +1,39 @@
+# FreeSWITCH ESL Configuration
+freeswitch:
+  esl:
+    # FreeSWITCH server host
+    host: 127.0.0.1
+    # ESL port (default 8021)
+    port: 8021
+    # ESL password (default ClueCon)
+    password: ClueCon
+    # Connection timeout in milliseconds
+    connect-timeout: 5000
+    # Read timeout in milliseconds
+    read-timeout: 30000
+    # Heartbeat interval in seconds (0 to disable)
+    heartbeat-interval: 25
+    # Auto reconnect on disconnect
+    auto-reconnect: true
+    # Reconnect interval in milliseconds
+    reconnect-interval: 5000
+    # Max reconnect attempts (0 for unlimited)
+    max-reconnect-attempts: 0
+    # Connection pool size
+    pool-size: 5
+    # Pool max wait time in milliseconds
+    pool-max-wait: 3000
+    # Enable SSL
+    ssl-enabled: false
+    # Event format: plain, json, xml
+    event-format: plain
+    # Events to subscribe
+    subscribe-events:
+      - all
+    # Enable event filtering
+    event-filter-enabled: false
+
+# Logging configuration
+logging:
+  level:
+    com.freeswitch: DEBUG
