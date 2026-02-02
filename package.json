@@ -1,0 +1,14 @@
+{
+  "name": "fs-real-time-audio-stream",
+  "version": "0.1.0",
+  "private": true,
+  "description": "使用 fs 实时读取正在增长的音频文件（PCM）并通过 WebSocket 推送到浏览器播放",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "writer:sine": "node tools/pcm-sine-writer.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.3"
+  }
+}
