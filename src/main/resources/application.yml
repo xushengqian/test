@@ -1,0 +1,45 @@
+server:
+  port: 8080
+
+# FreeSwtich ESL配置
+freeswitch:
+  esl:
+    # FreeSwtich服务器地址
+    host: 127.0.0.1
+    # ESL端口 (默认8021)
+    port: 8021
+    # ESL密码 (默认ClueCon)
+    password: ClueCon
+    # 连接超时时间(秒)
+    timeout: 30
+    # 心跳间隔(秒)
+    heartbeat-interval: 25
+    # 重连间隔(秒)
+    reconnect-interval: 5
+    # 最大重连次数
+    max-reconnect-attempts: 10
+
+# 音频流配置
+audio:
+  stream:
+    # 音频采样率
+    sample-rate: 8000
+    # 音频通道数 (1=单声道, 2=立体声)
+    channels: 1
+    # 每帧采样数
+    samples-per-frame: 160
+    # 音频格式 (L16 = 16位线性PCM)
+    format: L16
+    # 缓冲区大小
+    buffer-size: 4096
+    # 是否启用WebSocket输出
+    websocket-enabled: true
+    # 音频文件保存路径
+    save-path: /tmp/fs-audio
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.example.fsaudio: DEBUG
+    org.freeswitch: DEBUG
