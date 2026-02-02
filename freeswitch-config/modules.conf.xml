@@ -1,0 +1,34 @@
+<!--
+  FreeSWitch模块加载配置
+  
+  添加实时音频流所需的模块
+  
+  配置文件位置: /usr/local/freeswitch/conf/autoload_configs/
+-->
+
+<!-- 在modules.conf.xml中添加以下模块 -->
+
+<!-- ESL事件套接字(必需) -->
+<load module="mod_event_socket"/>
+
+<!-- Lua脚本支持(可选，用于复杂逻辑) -->
+<load module="mod_lua"/>
+
+<!-- HTTP客户端(用于HTTP方式推送音频) -->
+<load module="mod_httapi"/>
+
+<!-- shout协议支持(用于HTTP流式传输) -->
+<load module="mod_shout"/>
+
+<!-- 录音功能 -->
+<load module="mod_dptools"/>
+
+<!-- 音频流模块(如果使用mod_audio_stream) -->
+<!-- 注意: 这个模块可能需要单独编译安装 -->
+<!-- <load module="mod_audio_stream"/> -->
+
+<!-- WebSocket模块(FreeSWitch 1.10+) -->
+<!-- <load module="mod_websocket"/> -->
+
+<!-- 用于MRCP ASR/TTS集成 -->
+<!-- <load module="mod_unimrcp"/> -->

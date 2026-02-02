@@ -1,0 +1,24 @@
+<!--
+  Event Socket配置
+  
+  用于Java程序通过ESL连接FreeSWitch
+  
+  配置文件位置: /usr/local/freeswitch/conf/autoload_configs/
+-->
+
+<configuration name="event_socket.conf" description="Socket Client">
+  <settings>
+    <!-- 监听地址 (0.0.0.0表示所有网卡) -->
+    <param name="nat-map" value="false"/>
+    <param name="listen-ip" value="0.0.0.0"/>
+    
+    <!-- 监听端口 -->
+    <param name="listen-port" value="8021"/>
+    
+    <!-- 认证密码 -->
+    <param name="password" value="ClueCon"/>
+    
+    <!-- ACL访问控制(可选) -->
+    <!--<param name="apply-inbound-acl" value="lan"/>-->
+  </settings>
+</configuration>

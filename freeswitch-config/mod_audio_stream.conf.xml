@@ -1,0 +1,38 @@
+<!--
+  mod_audio_stream模块配置
+  
+  该模块允许将实时音频流发送到WebSocket服务器
+  
+  配置文件位置: /usr/local/freeswitch/conf/autoload_configs/
+-->
+
+<configuration name="audio_stream.conf" description="Audio Stream Configuration">
+  <settings>
+    <!-- 默认WebSocket服务器地址 -->
+    <param name="default-url" value="ws://127.0.0.1:8080/ws/audio-stream"/>
+    
+    <!-- 音频采样率 -->
+    <param name="sample-rate" value="8000"/>
+    
+    <!-- 音频格式: L16(PCM), PCMU, PCMA -->
+    <param name="codec" value="L16"/>
+    
+    <!-- 每个音频包的毫秒数 -->
+    <param name="ptime" value="20"/>
+    
+    <!-- 重连间隔(毫秒) -->
+    <param name="reconnect-interval" value="5000"/>
+    
+    <!-- 最大重试次数 -->
+    <param name="max-retries" value="3"/>
+    
+    <!-- 心跳间隔(秒) -->
+    <param name="heartbeat-interval" value="30"/>
+    
+    <!-- 是否启用SSL -->
+    <param name="ssl-enabled" value="false"/>
+    
+    <!-- 缓冲区大小(毫秒) -->
+    <param name="buffer-size" value="100"/>
+  </settings>
+</configuration>

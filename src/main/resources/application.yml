@@ -1,0 +1,48 @@
+server:
+  port: 8080
+
+# FreeSWitch ESL配置
+freeswitch:
+  esl:
+    # ESL服务器地址
+    host: 127.0.0.1
+    # ESL端口 (默认8021)
+    port: 8021
+    # ESL密码 (默认ClueCon)
+    password: ClueCon
+    # 连接超时时间(毫秒)
+    timeout: 30000
+    # 心跳间隔(秒)
+    heartbeat-interval: 25
+
+# 音频流配置
+audio:
+  stream:
+    # 采样率 (8000 或 16000)
+    sample-rate: 8000
+    # 位深度 (16)
+    bit-depth: 16
+    # 声道数 (1:单声道, 2:立体声)
+    channels: 1
+    # 音频格式 (L16 PCM)
+    format: L16
+    # 每个音频包的毫秒数
+    packet-time-ms: 20
+    # 音频缓冲区大小(字节)
+    buffer-size: 640
+
+# WebSocket配置
+websocket:
+  # 允许的来源
+  allowed-origins: "*"
+  # 心跳间隔(秒)
+  heartbeat-interval: 30
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.example.fsaudio: DEBUG
+    org.freeswitch: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

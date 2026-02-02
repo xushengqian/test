@@ -1,0 +1,87 @@
+<!--
+  FreeSWitch Dialplan配置示例
+  用于启用实时音频流功能
+  
+  将此文件放置到FreeSWitch的dialplan目录:
+  /usr/local/freeswitch/conf/dialplan/default/
+-->
+
+<include>
+  
+  <!-- 音频流测试分机 -->
+  <extension name="audio_stream_test">
+    <condition field="destination_number" expression="^9000$">
+      <action application="answer"/>
+      <action application="sleep" data="500"/>
+      
+      <!-- 启动音频流 - 发送到WebSocket服务器 -->
+      <!-- 使用mod_audio_stream模块 -->
+      <action application="set" data="RECORD_STEREO=true"/>
+      <action application="export" data="audio_stream_url=ws://YOUR_SERVER_IP:8080/ws/audio-stream/${uuid}"/>
+      <action application="uuid_audio_stream" data="${uuid} start ${audio_stream_url} mixed"/>
+      
+      <!-- 播放提示音 -->
+      <action application="playback" data="silence_stream://1000"/>
+      <action application="playback" data="tone_stream://%(1000,0,350,440)"/>
+      
+      <!-- 等待通话结束 -->
+      <action application="park"/>
+    </condition>
+  </extension>
+  
+  <!-- 使用record配合HTTP上传的方式 -->
+  <extension name="audio_stream_http">
+    <condition field="destination_number" expression="^9001$">
+      <action application="answer"/>
+      <action application="sleep" data="500"/>
+      
+      <!-- 使用shout协议通过HTTP推送音频 -->
+      <!-- 需要mod_shout模块 -->
+      <action application="record" data="shout://YOUR_SERVER_IP:8080/audio-stream/${uuid}/stream"/>
+      
+      <action application="park"/>
+    </condition>
+  </extension>
+  
+  <!-- 使用ESL控制音频流的分机 -->
+  <extension name="audio_stream_esl">
+    <condition field="destination_number" expression="^9002$">
+      <action application="answer"/>
+      <action application="sleep" data="500"/>
+      
+      <!-- 通过ESL服务器控制音频流启动 -->
+      <!-- 发送事件通知ESL服务器 -->
+      <action application="event" data="Event-Name=CUSTOM,Event-Subclass=audio_stream::request,uuid=${uuid},action=start"/>
+      
+      <!-- IVR或其他应用 -->
+      <action application="ivr" data="main_menu"/>
+    </condition>
+  </extension>
+  
+  <!-- 呼入自动开启音频流 -->
+  <extension name="inbound_with_audio_stream">
+    <condition field="destination_number" expression="^(\d{10,})$">
+      <action application="set" data="enable_audio_stream=true"/>
+      <action application="set" data="audio_stream_direction=both"/>
+      
+      <!-- 执行自定义Lua脚本启动音频流 -->
+      <action application="lua" data="start_audio_stream.lua"/>
+      
+      <!-- 转接到坐席 -->
+      <action application="bridge" data="user/$1@${domain_name}"/>
+    </condition>
+  </extension>
+  
+  <!-- 外呼开启音频流 -->
+  <extension name="outbound_with_audio_stream">
+    <condition field="${sip_h_X-Audio-Stream}" expression="^true$"/>
+    <condition field="destination_number" expression="^(\d+)$">
+      <!-- 设置音频流参数 -->
+      <action application="set" data="execute_on_answer=uuid_audio_stream ${uuid} start ws://YOUR_SERVER_IP:8080/ws/audio-stream/${uuid} mixed"/>
+      
+      <!-- 发起外呼 -->
+      <action application="bridge" data="sofia/gateway/your_gateway/$1"/>
+    </condition>
+  </extension>
+
+</include>
