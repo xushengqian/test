@@ -1,0 +1,23 @@
+{
+  "name": "fs-audio-stream",
+  "version": "1.0.0",
+  "description": "Node.js 文件系统音频流播放模块，支持播放完成事件",
+  "main": "src/index.js",
+  "scripts": {
+    "example": "node example/demo.js",
+    "test": "node test/test.js"
+  },
+  "keywords": [
+    "audio",
+    "stream",
+    "fs",
+    "file",
+    "playback",
+    "event"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
