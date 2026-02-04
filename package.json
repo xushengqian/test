@@ -1,0 +1,28 @@
+{
+  "name": "fs-audio-stream-player",
+  "version": "1.0.0",
+  "description": "基于 Node.js 的文件系统音频流播放器，支持播放完成事件",
+  "main": "src/index.js",
+  "types": "src/types.d.ts",
+  "scripts": {
+    "example": "node examples/basic-usage.js",
+    "example:events": "node examples/event-handling.js"
+  },
+  "keywords": [
+    "audio",
+    "stream",
+    "player",
+    "fs",
+    "event",
+    "completion"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "speaker": "^0.5.5"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
